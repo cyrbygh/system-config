@@ -84,7 +84,7 @@ function crypt {
                 echo " -> Up to date."
             else
                 if [[ "${_SYSTEM_OP}" == "encrypt-check" ]]; then
-                    echo " -> Needs encryption."
+                    error " -> Needs encryption."
                     return 1
                 fi
 
@@ -93,7 +93,7 @@ function crypt {
                     error " -> !! Failed to encrypt [${decrypted_file}] !!"
                     return 1
                 fi
-                printf "\033[0;32m -> Updated.\033[0m\n"
+                success " -> Updated."
             fi
             ;;
         uninstall)
@@ -138,7 +138,7 @@ function crypt {
                 return 1
             else
                 mv "${decryption_tmp}" "${decrypted_file}"
-                printf "\033[0;32m -> Decryption successful.\033[0m\n"
+                success " -> Decryption successful."
             fi
             ;;
     esac

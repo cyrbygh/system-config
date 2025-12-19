@@ -2,6 +2,10 @@ function error {
   printf "\033[0;31m%s\033[0m\n" "${1}"
 }
 
+function success {
+    printf "\033[0;32m%s\033[0m\n" "${1}"
+}
+
 function abspath {
     [[ ${1} = /* ]] && echo "${1}" || echo "${PWD}/${1#./}"
 }

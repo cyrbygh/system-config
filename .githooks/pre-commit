@@ -30,8 +30,8 @@ fi
 # Check if files need encryption before allowing the commit.
 if ! "${REPO_ROOT}/encrypt.sh" --check; then
     echo ""
-    echo "❌ Pre-commit hook failed: Files need encryption."
-    echo "   Run 'cfg-encrypt' to encrypt files, then commit again."
+    echo "❌ Changed decrypted file content discovered."
+    echo "   Run 'cfg-encrypt' to re-encrypt files, then commit again."
     echo ""
     exit 1
 fi

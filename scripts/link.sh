@@ -45,7 +45,7 @@ function link {
       else
         mkdir -p "$(dirname "${target}")"
         ln -s "${source}" "${target}"
-        printf "\033[0;32m -> Symlink created.\033[0m\n"
+        success " -> Symlink created."
       fi
       ;;
   esac
