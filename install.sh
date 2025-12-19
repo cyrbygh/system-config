@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Ensure the hooks defined in the repo are used.
+git config core.hooksPath .githooks
+
 SYSTEM_CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 CURRENT_SYSTEM=""
