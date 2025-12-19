@@ -1,0 +1,18 @@
+function cfg-update {
+  pushd ~/.system-config || return 1
+  {
+    git pull origin main
+    ./install.sh
+  } always {
+    popd
+  }
+}
+
+function cfg-encrypt {
+  pushd ~/.system-config || return 1
+  {
+    ./encrypt.sh
+  } always {
+    popd
+  }
+}

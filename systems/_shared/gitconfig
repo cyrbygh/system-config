@@ -1,0 +1,7 @@
+[core]
+    excludesfile = ~/.gitignore
+[user]
+    name = Kerb Byqvist
+    email = cyrbygh@users.noreply.github.com
+[url "git@github.com:cyrbygh/"]
+    insteadOf = https://github.com/cyrbygh/

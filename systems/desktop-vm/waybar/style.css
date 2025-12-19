@@ -1,0 +1,167 @@
+/* =============================================================================
+ *
+ * Waybar configuration
+ *
+ * Configuration reference: https://github.com/Alexays/Waybar/wiki/Configuration
+ *
+ * =========================================================================== */
+
+/* -----------------------------------------------------------------------------
+ * Keyframes
+ * -------------------------------------------------------------------------- */
+
+@keyframes blink-warning {
+    70% {
+        color: white;
+    }
+
+    to {
+        color: white;
+        background-color: orange;
+    }
+}
+
+@keyframes blink-critical {
+    70% {
+      color: white;
+    }
+
+    to {
+        color: white;
+        background-color: red;
+    }
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Base styles
+ * -------------------------------------------------------------------------- */
+
+/* Reset all styles */
+* {
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* The whole bar */
+#waybar {
+    background: #323232;
+    color: white;
+    font-family: Noto Sans Mono, sans-serif;
+    font-size: 16px;
+}
+
+/* Each module */
+#clock,
+#cpu,
+#memory,
+#mode,
+#network,
+#pulseaudio,
+#tray {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
+/* -----------------------------------------------------------------------------
+ * Module styles
+ * -------------------------------------------------------------------------- */
+
+#cpu {
+    color: #27ae60;
+}
+
+#cpu.warning {
+    color: orange;
+}
+
+#cpu.critical {
+    color: red;
+}
+
+#memory {
+    color: #2980b9;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+#memory.warning {
+    color: orange;
+}
+
+#memory.critical {
+    color: red;
+    animation-name: blink-critical;
+    animation-duration: 2s;
+}
+
+#mode {
+    background: #64727D;
+    border-top: 2px solid white;
+    /* To compensate for the top border and still have vertical centering */
+    padding-bottom: 2px;
+}
+
+#network {
+    color: #27ae60;
+}
+
+#network.disconnected {
+    color: orange;
+}
+
+#pulseaudio {
+    color: #2980b9;
+}
+
+#tray {
+    /* No styles */
+}
+
+#workspaces button {
+    padding-left: 5px;
+    padding-right: 5px;
+    color: #888888;
+}
+
+/* Disable the hover effect. */
+#workspaces button:hover {
+  box-shadow: none; /* Remove predefined box-shadow */
+  text-shadow: none; /* Remove predefined text-shadow */
+  background: none; /* Remove predefined background color (white) */
+  transition: none; /* Disable predefined animations */
+}
+
+
+#workspaces button.focused {
+    border-color: #4c7899;
+    color: white;
+    background-color: #285577;
+}
+
+#workspaces button.urgent {
+    border-color: #c9545d;
+    color: #c9545d;
+}
+
+#idle_inhibitor {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#idle_inhibitor.deactivated {
+    color: #34495e;
+}
+
+#idle_inhibitor.activated {
+    color: #ff0000;
+}
+
+#clock {
+    color: #95a5a6
+}

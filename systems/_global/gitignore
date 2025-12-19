@@ -1,0 +1,10 @@
+# Jetbrainz IDE metadata
+.idea/
+
+# Mac OS X files
+.DS_Store
+
+venv/
+__pycache__
+*.egg-info
+.claude/

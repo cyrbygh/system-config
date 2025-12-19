@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Check if files need encryption before allowing the commit.
+if ! cfg-encrypt --check; then
+    echo ""
+    echo "❌ Pre-commit hook failed: Files need encryption."
+    echo "   Run 'cfg-encrypt' to encrypt files, then commit again."
+    echo ""
+    exit 1
+fi
+
+echo "✅ All encrypted files are up to date."

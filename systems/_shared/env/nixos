@@ -1,0 +1,7 @@
+export _NIXOS_CONF_DIR="${HOME}/.system-config/systems/current/nixos"
+export _NIXOS_CONF_FILE="${_NIXOS_CONF_DIR}/configuration.nix"
+
+alias nixos-edit="vim ${_NIXOS_CONF_FILE}"
+alias nixos-hardware-edit="vim ${_NIXOS_CONF_DIR}/hardware-configuration.nix"
+alias nixos-apply="sudo nixos-rebuild switch -I nixos-config=${_NIXOS_CONF_FILE}"
+

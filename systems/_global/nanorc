@@ -1,0 +1,15 @@
+set regexp
+set tabsize 4
+set tabstospaces
+set nowrap
+set softwrap
+set const
+
+# Nano will be annoying about failed includes otherwise
+set quiet
+
+# For OS X with nano from brew
+include /usr/local/share/nano/*.nanorc
+
+# For Linux systems
+include /usr/share/nano/*.nanorc
