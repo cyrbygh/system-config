@@ -1,7 +1,31 @@
 #!/bin/bash
 
-# Get the directory of this script, then find encrypt.sh relative to repo root
+# Get the directory of this script, then find encrypt.sh relative to repo root.
 REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+# Get current system name.
+CURRENT_SYSTEM_DIR="${REPO_ROOT}/systems/current"
+if [ -e "${CURRENT_SYSTEM_DIR}" ]; then
+    CURRENT_SYSTEM="$(basename "$(readlink "${CURRENT_SYSTEM_DIR}")")"
+else
+    CURRENT_SYSTEM=""
+fi
+
+# Check for decrypted files in non-current systems.
+found_foreign_decrypted=false
+while IFS= read -r -d '' file; do
+    # Extract system name from path (e.g., systems/work-laptop/file.decrypted -> work-laptop).
+    system_name="$(echo "${file#"${REPO_ROOT}/"}" | sed 's|^systems/||' | cut -d'/' -f1)"
+
+    if [ "${system_name}" != "${CURRENT_SYSTEM}" ]; then
+        echo "❌ Found decrypted file for non-current system: ${file}"
+        found_foreign_decrypted=true
+    fi
+done < <(find "${REPO_ROOT}/systems" -name "*.decrypted" -print0 2>/dev/null)
+
+if [ "${found_foreign_decrypted}" = true ]; then
+    exit 1
+fi
 
 # Check if files need encryption before allowing the commit.
 if ! "${REPO_ROOT}/encrypt.sh" --check; then
