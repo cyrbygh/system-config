@@ -54,6 +54,7 @@
     age
     ethtool
     ffmpeg
+    kitty
     xwayland-satellite
   ]);
 
