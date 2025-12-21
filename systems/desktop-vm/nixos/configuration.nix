@@ -56,6 +56,7 @@
     ethtool
     ffmpeg
     kitty
+    tvnamer
     vlc
     xwayland-satellite
   ]);
