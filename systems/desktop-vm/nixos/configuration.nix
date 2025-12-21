@@ -23,7 +23,7 @@
 
   services.greetd.settings.default_session = {
     command = "sway";
-    user = "user";
+    user = "muser";
   };
 
   services.flatpak.enable = true;
