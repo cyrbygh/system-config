@@ -45,7 +45,11 @@ function link {
       else
         mkdir -p "$(dirname "${target}")"
         ln -s "${source}" "${target}"
-        success " -> Symlink created."
+        if [[ $? != 0 ]]; then
+          error " -> Failed to create symlink."
+        else
+          success " -> Symlink created."
+        fi
       fi
       ;;
   esac
