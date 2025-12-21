@@ -23,10 +23,10 @@ titlebar_padding 4 1
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec foot
+bindsym $mod+Return exec kitty
 
 # kill focused window
-bindsym $mod+Shift+q kill
+bindsym $mod+q kill
 
 # start program launcher
 bindsym $mod+d exec fuzzel
