@@ -52,9 +52,11 @@
 
   environment.systemPackages = lib.mkAfter (with pkgs; [
     age
+    asunder
     ethtool
     ffmpeg
     kitty
+    vlc
     xwayland-satellite
   ]);
 
