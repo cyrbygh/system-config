@@ -26,7 +26,7 @@ function git_prompt_info() {
   local dirty=""
   [[ -n $(git status --porcelain 2>/dev/null) ]] && dirty="%F{red} *%f"
 
-  echo "%F{green}%B[${branch}${dirty}]%b%f"
+  echo "%F{green}%B[${branch}%f${dirty}%F{green}]%b%f"
 }
 
 setopt prompt_subst  # allow zsh evaluation and expansion within the prompt string
