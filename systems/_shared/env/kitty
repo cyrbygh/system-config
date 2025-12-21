@@ -1,0 +1,2 @@
+alias icat="kitty +kitten icat --align left"
+alias vcat="mpv --vo=kitty"
