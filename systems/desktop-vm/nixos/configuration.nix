@@ -43,7 +43,7 @@
     capSysAdmin = true; # Needed for Wayland input support.
   };
 
-  users.users.user = {
+  users.users.muser = {
     extraGroups = lib.mkAfter [
       "cdrom"
       "docker"
@@ -51,6 +51,7 @@
   };
 
   environment.systemPackages = lib.mkAfter (with pkgs; [
+    age
     ethtool
     ffmpeg
     xwayland-satellite
@@ -62,7 +63,7 @@
   services.syncthing = {
     enable = true;
     group = "users";
-    user = "user";
+    user = "muser";
     dataDir = "/sync/data";
     configDir = "/sync/config";
   };
