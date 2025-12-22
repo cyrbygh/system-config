@@ -8,6 +8,15 @@ function cfg-update {
   }
 }
 
+function cfg-install {
+  pushd ~/.system-config || return 1
+  {
+    ./install.sh
+  } always {
+    popd
+  }
+}
+
 function cfg-encrypt {
   pushd ~/.system-config || return 1
   {
