@@ -10,6 +10,11 @@ function abspath {
     [[ ${1} = /* ]] && echo "${1}" || echo "${PWD}/${1#./}"
 }
 
+function crypt-link {
+    crypt "${1}"
+    link "${1}.decrypted" "${2}"
+}
+
 # The directory of the system config repo.
 SYSTEM_CONFIG_DIR="$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")"
 
