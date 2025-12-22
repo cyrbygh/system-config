@@ -77,7 +77,7 @@
   services.nfs.server = {
     enable = true;
     exports = ''
-      /home/user/usb-host-share usb-host.inf(rw,sync,no_subtree_check,fsid=0,no_root_squash)
+      /home/muser/usb-host-share usb-host.inf(rw,sync,no_subtree_check,fsid=0,no_root_squash)
     '';
   };
 
