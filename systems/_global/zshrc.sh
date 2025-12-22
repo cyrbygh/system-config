@@ -36,7 +36,7 @@ RPROMPT='$(git_prompt_info)'
 
 # Load any extra custom configuration for this machine.
 if [[ -d ~/.env ]]; then
-  find -L ~/.env -type f | while read -r file; do
+  find -L ~/.env -type f | sort | while read -r file; do
     source "${file}"
   done
 fi
