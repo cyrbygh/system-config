@@ -21,7 +21,12 @@ bindkey '^R' history-incremental-search-backward
 
 function git_prompt_info() {
   local branch=$(git branch --show-current 2>/dev/null)
-  [[ -n "${branch}" ]] || return
+
+  # If no branch (detached HEAD), show short commit hash instead.
+  if [[ -z "${branch}" ]]; then
+    branch=$(git rev-parse --short HEAD 2>/dev/null)
+    [[ -n "${branch}" ]] || return
+  fi
 
   local dirty=""
   [[ -n $(git status --porcelain 2>/dev/null) ]] && dirty="%F{red} *%f"
