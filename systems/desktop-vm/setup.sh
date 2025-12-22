@@ -17,7 +17,5 @@ link ../_shared/env/nixos ~/.env/nixos
 link ../_shared/env/flatpak ~/.env/flatpak
 link ../_shared/gitconfig ~/.gitconfig
 
-crypt ./ssh/id_ed25519
-link ./ssh/id_ed25519.decrypted ~/.ssh/id_ed25519
+crypt-link ./ssh/id_ed25519 ~/.ssh/id_ed25519
 link ./ssh/id_ed25519.pub ~/.ssh/id_ed25519.pub
-

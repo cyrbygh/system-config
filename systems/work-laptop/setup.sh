@@ -7,9 +7,10 @@ pushd ../_global > /dev/null
 popd > /dev/null
 . ../../scripts/encrypt.sh
 
-crypt ./gitconfig
-link ./gitconfig.decrypted ~/.gitconfig
+crypt-link ./gitconfig ~/.gitconfig
 link ../_shared/gitconfig ~/.gitconfig-anon
+
+crypt-link ./env ~/.env/work
 
 crypt ./wg/host
 crypt ./wg/private_key
