@@ -161,6 +161,9 @@ output "*" background '#0a3d62' solid_color
 output "DP-1" enable
 output "DP-1" scale 2
 
+# Make the cursor not the size of an atom.
+seat * xcursor_theme Adwaita 20
+
 bar swaybar_command waybar
 
 # Fix GTK apps... somehow.
