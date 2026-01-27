@@ -5,3 +5,6 @@
     email = cyrbygh@users.noreply.github.com
 [url "git@github.com:cyrbygh/"]
     insteadOf = https://github.com/cyrbygh/
+[commit]
+    gpgsign = false
+
