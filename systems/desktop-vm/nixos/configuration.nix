@@ -45,8 +45,14 @@
     };
   };
 
+  fonts.packages = with pkgs; [
+    font-awesome
+    noto-fonts
+    noto-fonts-color-emoji
+  ];
+
   environment.variables = {
-    GTK_THEME = "Awaita-dark";
+    GTK_THEME = "Adwaita-dark";
   };
 
   programs.sway = {
@@ -57,18 +63,6 @@
   services.greetd.settings.default_session = {
     command = "sway";
     user = "muser";
-  };
-
-  services.flatpak.enable = true;
-  xdg = {
-    portal = {
-      config.common.default = "*";
-      enable = true;
-      extraPortals = [
-        pkgs.xdg-desktop-portal-wlr
-        pkgs.xdg-desktop-portal-gtk
-      ];
-    };
   };
 
   services.sunshine = {

@@ -15,12 +15,6 @@
 
   systemd.network.wait-online.enable = true;
 
-  fonts.packages = with pkgs; [
-    font-awesome
-    noto-fonts
-    noto-fonts-color-emoji
-  ];
-
   time.timeZone = "America/Los_Angeles";
 
   i18n.defaultLocale = "en_US.UTF-8";
@@ -29,20 +23,9 @@
     enable = true;
     settings = {
       default_session = {
-        command = lib.mkDefault "${pkgs.tuigreet}/bin/tuigreet --time --cmd /bin/bash";
+        command = lib.mkDefault "${pkgs.tuigreet}/bin/tuigreet --time";
         user = lib.mkDefault "greeter";
       };
-    };
-  };
-
-  xdg = {
-    portal = {
-      config.common.default = "*";
-      enable = true;
-      extraPortals = [
-        pkgs.xdg-desktop-portal-wlr
-        pkgs.xdg-desktop-portal-gtk
-      ];
     };
   };
 
