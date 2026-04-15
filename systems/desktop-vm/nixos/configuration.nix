@@ -21,6 +21,39 @@
       ''
     )];
 
+  services.pipewire = {
+    enable = true;
+    pulse.enable = true;
+  };
+
+  services.flatpak.enable = true;
+
+  system.activationScripts.addFlathub = {
+    text = ''
+      ${pkgs.flatpak}/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
+    '';
+  };
+
+  xdg = {
+    portal = {
+      config.common.default = "*";
+      enable = true;
+      extraPortals = [
+        pkgs.xdg-desktop-portal-wlr
+        pkgs.xdg-desktop-portal-gtk
+      ];
+    };
+  };
+
+  environment.variables = {
+    GTK_THEME = "Awaita-dark";
+  };
+
+  programs.sway = {
+    enable = true;
+    wrapperFeatures.gtk = true;
+  };
+
   services.greetd.settings.default_session = {
     command = "sway";
     user = "muser";
@@ -51,13 +84,19 @@
   };
 
   environment.systemPackages = lib.mkAfter (with pkgs; [
-    age
     asunder
     ethtool
     ffmpeg
+    firefox
+    fuzzel
+    gnome-themes-extra # Needed to persuade apps into dark mode.
     kitty
+    libnotify
+    mako
+    pavucontrol
     tvnamer
     vlc
+    waybar
     xwayland-satellite
   ]);
 
