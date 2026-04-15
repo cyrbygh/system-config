@@ -33,6 +33,8 @@
     LIBVA_DRIVER_NAME = "iHD";
   };
 
+  security.polkit.enable = true;
+
   services.openssh.enable = true;
   services.printing.enable = true;
 
