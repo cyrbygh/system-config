@@ -7,19 +7,7 @@
       ../../_shared/configuration.nix
     ];
 
-  networking.hostName = "desktop-vm";
-
-  boot.kernelParams = [
-    "video=DP-1:e"
-    "drm.edid_firmware=DP-1:edid/fake-edid.bin"
-  ];
-  hardware.firmware = [
-    (
-      pkgs.runCommand "edid.bin" { } ''
-        mkdir -p $out/lib/firmware/edid
-        cp ${/edid/fake-edid.bin} $out/lib/firmware/edid/fake-edid.bin
-      ''
-    )];
+  networking.hostName = "office-desktop";
 
   services.pipewire = {
     enable = true;
@@ -55,32 +43,25 @@
     GTK_THEME = "Adwaita-dark";
   };
 
-  programs.sway = {
-    enable = true;
-    wrapperFeatures.gtk = true;
-  };
-
   services.greetd.settings.default_session = {
     command = "sway";
     user = "muser";
   };
 
-  services.sunshine = {
-    enable = true;
-    capSysAdmin = true; # Needed for Wayland input support.
-  };
+  # Necessary for remote input to work with sunshine.
+  hardware.uinput.enable = true;
 
   users.users.muser = {
     extraGroups = lib.mkAfter [
       "cdrom"
+      "dialout"
       "docker"
+      "uinput"
     ];
   };
 
   environment.systemPackages = lib.mkAfter (with pkgs; [
-    asunder
-    ethtool
-    ffmpeg
+    chromium
     firefox
     fuzzel
     gnome-themes-extra # Needed to persuade apps into dark mode.
@@ -88,7 +69,7 @@
     libnotify
     mako
     pavucontrol
-    tvnamer
+    sway
     vlc
     waybar
     xwayland-satellite

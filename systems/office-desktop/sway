@@ -1,4 +1,4 @@
-set $mod Mod4
+set $mod Mod1
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -145,10 +145,10 @@ mode passthrough {
 }
 bindsym $mod+Delete mode passthrough
 
-output "*" disable
+#output "*" disable
 output "*" background '#0a3d62' solid_color
-output "DP-1" enable
-output "DP-1" scale 2
+#output "DP-1" enable
+output "*" scale 2
 
 # Make the cursor not the size of an atom.
 seat * xcursor_theme Adwaita 20
