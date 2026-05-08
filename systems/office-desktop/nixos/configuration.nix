@@ -43,10 +43,7 @@
     GTK_THEME = "Adwaita-dark";
   };
 
-  services.greetd.settings.default_session = {
-    command = "sway";
-    user = "muser";
-  };
+  services.greetd.settings.default_session.command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd sway";
 
   # Necessary for remote input to work with sunshine.
   hardware.uinput.enable = true;
