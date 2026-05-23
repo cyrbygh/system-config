@@ -66,11 +66,15 @@
     libnotify
     mako
     pavucontrol
-    sway
     vlc
     waybar
     xwayland-satellite
   ]);
+
+  programs.sway = {
+    enable = true;
+    wrapperFeatures.gtk = true;
+  };
 
   services.openssh.enable = true;
   services.avahi.enable = true;
