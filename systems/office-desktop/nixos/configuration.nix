@@ -57,15 +57,20 @@
     ];
   };
 
+  # Selectively enable unfree.
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+    "claude-code"
+  ];
+
   environment.systemPackages = lib.mkAfter (with pkgs; [
-    chromium
-    firefox
+    claude-code
     fuzzel
     gnome-themes-extra # Needed to persuade apps into dark mode.
     kitty
     libnotify
     mako
     pavucontrol
+    ungoogled-chromium
     vlc
     waybar
     xwayland-satellite
