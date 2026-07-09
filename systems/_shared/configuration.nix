@@ -50,4 +50,7 @@
   ];
 
   programs.zsh.enable = true;
+
+  # Helps enable realtime scheduling for unprivileged programs.
+  security.rtkit.enable = true;
 }
