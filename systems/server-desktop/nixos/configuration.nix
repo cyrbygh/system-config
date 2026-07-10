@@ -48,12 +48,24 @@
     GTK_THEME = "Adwaita-dark";
   };
 
-  # Auto-login directly to sway. greetd handles PAM session setup
-  # (XDG_RUNTIME_DIR, systemd user manager, loginctl session).
-  services.greetd.settings.default_session = {
-    command = "${config.programs.sway.package}/bin/sway";
-    user = "muser";
-  };
+  # greetd requires VT/KMS ioctls which LXC containers don't support,
+  # so we use getty autologin instead.
+  services.greetd.enable = lib.mkForce false;
+
+  # Autologin muser on tty1 (already enabled by proxmox-lxc.nix).
+  services.getty.autologinUser = "muser";
+
+  # Linger keeps the user's systemd instance running from boot,
+  # which creates XDG_RUNTIME_DIR (pam_systemd fails in this container).
+  users.users.muser.linger = true;
+
+  # Login shells on tty1 start sway. loginShellInit writes to /etc/zprofile
+  # (login shells only), so this won't fire in terminals opened within sway.
+  programs.zsh.loginShellInit = ''
+    if [ "$(tty)" = "/dev/tty1" ]; then
+      exec sway
+    fi
+  '';
 
   programs.sway = {
     enable = true;
