@@ -4,7 +4,7 @@
   outputs = { self, nixpkgs }:
   let
     lib = nixpkgs.lib;
-    systemNames = lib.pipe (builtins.readDir ../../) [
+    systemNames = lib.pipe (builtins.readDir ../.. ) [
       (lib.filterAttrs (name: type:
         type == "directory"
         && !lib.hasPrefix "_" name
