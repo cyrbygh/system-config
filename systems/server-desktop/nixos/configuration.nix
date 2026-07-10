@@ -48,24 +48,20 @@
     GTK_THEME = "Adwaita-dark";
   };
 
-  # greetd requires VT/KMS ioctls which LXC containers don't support,
-  # so we use getty autologin instead.
+  # greetd requires VT/KMS ioctls which LXC containers don't support.
   services.greetd.enable = lib.mkForce false;
 
-  # Autologin muser on tty1 (already enabled by proxmox-lxc.nix).
-  services.getty.autologinUser = "muser";
-
-  # Linger keeps the user's systemd instance running from boot,
-  # which creates XDG_RUNTIME_DIR (pam_systemd fails in this container).
+  # Linger starts muser's systemd instance at boot, which creates
+  # XDG_RUNTIME_DIR and runs user services (pam_systemd fails in this container).
   users.users.muser.linger = true;
 
-  # Non-SSH login shells start sway. loginShellInit writes to /etc/zprofile
-  # (login shells only), so this won't fire in terminals opened within sway.
-  programs.zsh.loginShellInit = ''
-    if [[ -z "$SSH_CLIENT" && -z "$SSH_TTY" ]]; then
-      exec sway
-    fi
-  '';
+  systemd.user.services.sway = {
+    wantedBy = [ "default.target" ];
+    serviceConfig = {
+      ExecStart = "${config.programs.sway.package}/bin/sway";
+      Restart = "on-failure";
+    };
+  };
 
   programs.sway = {
     enable = true;
