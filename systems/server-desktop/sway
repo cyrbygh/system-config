@@ -127,7 +127,6 @@ input * {
     xkb_options compose:ralt
 }
 
-exec systemctl --user import-environment
 exec mako
 
 exec swayidle \
@@ -135,6 +134,7 @@ exec swayidle \
     timeout 120 'swaymsg "output * dpms off"' \
         resume 'swaymsg "output * dpms on"'
 
-# Start the sunshine service. Must be launched from sway because
-# graphical-session.target is never activated in this setup.
-exec systemctl --user start sunshine
+# import-environment must finish before sunshine starts so that WAYLAND_DISPLAY
+# is in the user systemd manager environment — both commands run concurrently
+# otherwise and sunshine loses the race.
+exec sh -c 'systemctl --user import-environment && systemctl --user start sunshine'
