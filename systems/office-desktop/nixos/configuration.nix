@@ -4,7 +4,7 @@
   imports =
     [
       ./hardware-configuration.nix
-      ../../_shared/configuration.nix
+      ../../_shared/nixos/configuration.nix
     ];
 
   networking.hostName = "office-desktop";

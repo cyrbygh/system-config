@@ -4,18 +4,18 @@
   outputs = { self, nixpkgs }:
   let
     lib = nixpkgs.lib;
-    systemNames = lib.pipe (builtins.readDir ./systems) [
+    systemNames = lib.pipe (builtins.readDir ../../) [
       (lib.filterAttrs (name: type:
         type == "directory"
         && !lib.hasPrefix "_" name
-        && builtins.pathExists ./systems/${name}/nixos/configuration.nix
+        && builtins.pathExists ../../${name}/nixos/configuration.nix
       ))
       builtins.attrNames
     ];
   in {
     nixosConfigurations = lib.genAttrs systemNames (name:
       nixpkgs.lib.nixosSystem {
-        modules = [ ./systems/${name}/nixos/configuration.nix ];
+        modules = [ ../../${name}/nixos/configuration.nix ];
       }
     );
   };
