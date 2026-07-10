@@ -59,10 +59,10 @@
   # which creates XDG_RUNTIME_DIR (pam_systemd fails in this container).
   users.users.muser.linger = true;
 
-  # Login shells on tty1 start sway. loginShellInit writes to /etc/zprofile
+  # Non-SSH login shells start sway. loginShellInit writes to /etc/zprofile
   # (login shells only), so this won't fire in terminals opened within sway.
   programs.zsh.loginShellInit = ''
-    if [ "$(tty)" = "/dev/tty1" ]; then
+    if [[ -z "$SSH_CLIENT" && -z "$SSH_TTY" ]]; then
       exec sway
     fi
   '';
