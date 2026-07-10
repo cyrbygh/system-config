@@ -73,7 +73,10 @@
     '';
   };
 
-  services.sunshine.enable = true;
+  services.sunshine = {
+    enable = true;
+    settings.capture = "wlgrab";
+  };
 
   # Necessary for remote input to work with sunshine.
   # Proxmox host must pass through /dev/uinput to the container.
