@@ -11,4 +11,5 @@ crypt-link ./gitconfig ~/.gitconfig
 link ../_shared/gitconfig ~/.gitconfig-anon
 
 crypt-link ./env ~/.env/work
+crypt-link ./claude_global_conf.md ~/.claude/CLAUDE.md
 
