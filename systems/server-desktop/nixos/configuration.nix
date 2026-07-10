@@ -69,6 +69,7 @@
     extraSessionCommands = ''
       export WLR_BACKENDS=headless
       export WLR_RENDERER=pixman
+      export PATH=/run/current-system/sw/bin:/run/wrappers/bin:$PATH
     '';
   };
 
