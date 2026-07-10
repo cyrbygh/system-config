@@ -77,12 +77,17 @@
     enable = true;
   };
 
-  # chooser_type=none: skip the output chooser entirely and share all outputs.
-  # Required for headless operation — the default chooser hangs waiting for user input.
-  environment.etc."xdg-desktop-portal/wlr-portals.conf".text = ''
-    [screencast]
-    chooser_type=none
-  '';
+  # sunshine needs WAYLAND_DISPLAY from the sway session. Rather than relying on
+  # import-environment, set it directly and declare the sway dependency so systemd
+  # starts sunshine after sway creates the Wayland socket.
+  systemd.user.services.sunshine = {
+    after = [ "sway.service" ];
+    bindsTo = [ "sway.service" ];
+    wantedBy = [ "sway.service" ];
+    serviceConfig = {
+      Environment = "WAYLAND_DISPLAY=wayland-1";
+    };
+  };
 
   # Necessary for remote input to work with sunshine.
   # Proxmox host must pass through /dev/uinput to the container.
