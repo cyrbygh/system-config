@@ -75,8 +75,14 @@
 
   services.sunshine = {
     enable = true;
-    settings.capture = "wlgrab";
   };
+
+  # chooser_type=none: skip the output chooser entirely and share all outputs.
+  # Required for headless operation — the default chooser hangs waiting for user input.
+  environment.etc."xdg-desktop-portal/wlr-portals.conf".text = ''
+    [screencast]
+    chooser_type=none
+  '';
 
   # Necessary for remote input to work with sunshine.
   # Proxmox host must pass through /dev/uinput to the container.
