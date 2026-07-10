@@ -64,15 +64,10 @@
     '';
   };
 
-  # Sunshine game streaming.
-  # Proxmox host must also mark the container as privileged for cap_sys_admin.
-  services.sunshine = {
-    enable = true;
-    capSysAdmin = true;
-  };
+  services.sunshine.enable = true;
 
   # Necessary for remote input to work with sunshine.
-  # Proxmox host must pass through /dev/uinput and have uinput module loaded.
+  # Proxmox host must pass through /dev/uinput to the container.
   hardware.uinput.enable = true;
 
   users.users.muser = {
