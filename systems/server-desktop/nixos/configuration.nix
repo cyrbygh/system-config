@@ -139,7 +139,7 @@ in
     extraSessionCommands = ''
       export WLR_BACKENDS=headless,libinput
       export WLR_RENDER_DRM_DEVICE=/dev/dri/renderD128
-      export LIBSEAT_BACKEND=noop
+      export LIBSEAT_BACKEND=seatd
       export WLR_LIBINPUT_NO_DEVICES=1
       export PATH=/run/current-system/sw/bin:/run/wrappers/bin:$PATH
     '';
