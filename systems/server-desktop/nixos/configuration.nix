@@ -12,6 +12,7 @@ let
     else
       ${pkgs.sway}/bin/swaymsg output HEADLESS-1 resolution "$SUNSHINE_CLIENT_WIDTH"x"$SUNSHINE_CLIENT_HEIGHT"
     fi
+    sleep 0.5
   '';
 
   # Lock the session on disconnect unless it is already locked. Moonlight pairing is the
@@ -53,6 +54,11 @@ in
   # systemd-boot, which conflicts.
   boot.loader.systemd-boot.enable = lib.mkForce false;
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
+
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [ intel-media-driver ];
+  };
 
   services.pipewire = {
     enable = true;
@@ -128,7 +134,7 @@ in
     wrapperFeatures.gtk = true;
     extraSessionCommands = ''
       export WLR_BACKENDS=headless
-      export WLR_RENDERER=pixman
+      export WLR_RENDER_DRM_DEVICE=/dev/dri/renderD128
       export PATH=/run/current-system/sw/bin:/run/wrappers/bin:$PATH
     '';
   };
