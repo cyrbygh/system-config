@@ -135,6 +135,20 @@ in
   services.seatd.enable = true;
   systemd.services.seatd.environment.SEATD_VTBOUND = "0";
 
+  # LXC bind-mounts /run/udev from the host to /mnt/host-udev. Systemd remounts /run as a
+  # fresh tmpfs early in boot, which would hide a direct /run/udev bind-mount. This unit
+  # re-applies it after /run is set up so libinput can receive host udev events when sunshine
+  # creates virtual input devices.
+  systemd.mounts = [{
+    what = "/mnt/host-udev";
+    where = "/run/udev";
+    type = "none";
+    options = "bind";
+    after = [ "run.mount" ];
+    before = [ "systemd-udevd.service" "seatd.service" ];
+    wantedBy = [ "sysinit.target" ];
+  }];
+
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
