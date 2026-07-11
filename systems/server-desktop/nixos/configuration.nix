@@ -103,11 +103,45 @@ in
 
   systemd.user.services.sway = {
     wantedBy = [ "default.target" ];
+    # Start after sunshine so libinput finds its uinput devices on the initial scan.
+    after = [ "sunshine.service" ];
     serviceConfig = {
+      # Poll until sunshine's virtual keyboard appears, with a 10s timeout so sway
+      # still starts even if sunshine is slow or in a crash-restart loop.
+      # /proc/bus/input/devices is used because /sys/class/input is not visible
+      # across the host/container boundary for bind-mounted uinput devices.
+      ExecStartPre = pkgs.writeShellScript "wait-for-sunshine-input" ''
+        for i in $(seq 100); do
+          grep -q "Keyboard passthrough" /proc/bus/input/devices 2>/dev/null && exit 0
+          sleep 0.1
+        done
+        exit 0
+      '';
       ExecStart = "${config.programs.sway.package}/bin/sway";
       Restart = "on-failure";
     };
   };
+
+  # Start sunshine early so its uinput devices exist before sway's libinput initialises.
+  # wantedBy moves it from graphical-session.target (too late) to default.target.
+  systemd.user.services.sunshine = {
+    overrideStrategy = "asDropin";
+    wantedBy = lib.mkForce [ "default.target" ];
+  };
+
+  # NixOS omits empty list fields rather than writing "After=" (the systemd syntax for
+  # resetting a directive). Write the drop-in directly so the reset lines are present,
+  # and hardcode WAYLAND_DISPLAY so sunshine can connect once sway's socket appears.
+  environment.etc."systemd/user/sunshine.service.d/before-sway.conf".text = ''
+    [Unit]
+    After=
+    Wants=
+    PartOf=
+
+    [Service]
+    Environment=WAYLAND_DISPLAY=wayland-1
+    Environment=XDG_RUNTIME_DIR=/run/user/1000
+  '';
 
   # sway is the only compositor on this machine, so graphical-session.target's
   # RefuseManualStart restriction serves no purpose here. Override it so sway's
@@ -135,19 +169,6 @@ in
   services.seatd.enable = true;
   systemd.services.seatd.environment.SEATD_VTBOUND = "0";
 
-  # LXC bind-mounts /run/udev from the host to /mnt/host-udev. Systemd remounts /run as a
-  # fresh tmpfs early in boot, which would hide a direct /run/udev bind-mount. This unit
-  # re-applies it after /run is set up so libinput can receive host udev events when sunshine
-  # creates virtual input devices.
-  systemd.mounts = [{
-    what = "/mnt/host-udev";
-    where = "/run/udev";
-    type = "none";
-    options = "bind";
-    after = [ "run.mount" ];
-    before = [ "systemd-udevd.service" "seatd.service" ];
-    wantedBy = [ "sysinit.target" ];
-  }];
 
   programs.sway = {
     enable = true;
