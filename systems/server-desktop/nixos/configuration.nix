@@ -109,34 +109,6 @@ in
     };
   };
 
-  # When sunshine creates virtual input devices via uinput, the kernel fires the uevent
-  # in the host namespace so the container's udevd never sees it and libinput never
-  # discovers the devices. /sys/class/input/ is not namespace-scoped, so the devices are
-  # visible there regardless. udevadm trigger synthesises add-events from those sysfs
-  # entries, letting udevd notify libinput — no host-side changes required.
-  # Runs as root (required for udevadm trigger) and re-arms after each disappearance
-  # so that sunshine restarts are handled automatically.
-  systemd.services.sunshine-input-trigger = {
-    description = "Trigger udev input rescan when sunshine's virtual devices appear";
-    after = [ "systemd-udevd.service" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "simple";
-      Restart = "on-failure";
-      ExecStart = pkgs.writeShellScript "sunshine-input-trigger" ''
-        while true; do
-          until grep -q "Keyboard passthrough" /proc/bus/input/devices 2>/dev/null; do
-            sleep 1
-          done
-          udevadm trigger --subsystem-match=input
-          udevadm settle
-          until ! grep -q "Keyboard passthrough" /proc/bus/input/devices 2>/dev/null; do
-            sleep 5
-          done
-        done
-      '';
-    };
-  };
 
   # sway is the only compositor on this machine, so graphical-session.target's
   # RefuseManualStart restriction serves no purpose here. Override it so sway's
