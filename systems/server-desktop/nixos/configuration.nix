@@ -154,6 +154,15 @@ in
     ];
   };
 
+  # systemd-udevd refuses to start when /sys is read-only (the default in LXC containers).
+  # Clearing the condition lets it run — it doesn't need to write to sysfs for our use
+  # case; it just needs to receive kernel uevents via netlink and forward them to libudev
+  # monitors, which is what libinput uses to discover new input devices.
+  systemd.services.systemd-udevd = {
+    overrideStrategy = "asDropin";
+    unitConfig.ConditionPathIsReadWrite = "";
+  };
+
   users.users.muser = {
     extraGroups = lib.mkAfter [
       "cdrom"
