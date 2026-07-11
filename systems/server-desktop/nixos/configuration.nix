@@ -123,25 +123,19 @@ in
   };
 
   # Start sunshine early so its uinput devices exist before sway's libinput initialises.
-  # wantedBy moves it from graphical-session.target (too late) to default.target.
+  # mkForce clears the graphical-session.target ordering the sunshine module adds;
+  # NixOS merges these into one unit file so the directives simply aren't generated.
+  # WAYLAND_DISPLAY is hardcoded so sunshine can connect once sway's socket appears.
   systemd.user.services.sunshine = {
-    overrideStrategy = "asDropin";
     wantedBy = lib.mkForce [ "default.target" ];
+    after = lib.mkForce [];
+    wants = lib.mkForce [];
+    partOf = lib.mkForce [];
+    environment = {
+      WAYLAND_DISPLAY = "wayland-1";
+      XDG_RUNTIME_DIR = "/run/user/1000";
+    };
   };
-
-  # NixOS omits empty list fields rather than writing "After=" (the systemd syntax for
-  # resetting a directive). Write the drop-in directly so the reset lines are present,
-  # and hardcode WAYLAND_DISPLAY so sunshine can connect once sway's socket appears.
-  environment.etc."systemd/user/sunshine.service.d/before-sway.conf".text = ''
-    [Unit]
-    After=
-    Wants=
-    PartOf=
-
-    [Service]
-    Environment=WAYLAND_DISPLAY=wayland-1
-    Environment=XDG_RUNTIME_DIR=/run/user/1000
-  '';
 
   # sway is the only compositor on this machine, so graphical-session.target's
   # RefuseManualStart restriction serves no purpose here. Override it so sway's
