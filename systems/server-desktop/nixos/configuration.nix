@@ -103,37 +103,38 @@ in
 
   systemd.user.services.sway = {
     wantedBy = [ "default.target" ];
-    # Start after sunshine so libinput finds its uinput devices on the initial scan.
-    after = [ "sunshine.service" ];
     serviceConfig = {
-      # Poll until sunshine's virtual keyboard appears, with a 10s timeout so sway
-      # still starts even if sunshine is slow or in a crash-restart loop.
-      # /proc/bus/input/devices is used because /sys/class/input is not visible
-      # across the host/container boundary for bind-mounted uinput devices.
-      ExecStartPre = pkgs.writeShellScript "wait-for-sunshine-input" ''
-        for i in $(seq 100); do
-          grep -q "Keyboard passthrough" /proc/bus/input/devices 2>/dev/null && exit 0
-          sleep 0.1
-        done
-        exit 0
-      '';
       ExecStart = "${config.programs.sway.package}/bin/sway";
       Restart = "on-failure";
     };
   };
 
-  # Start sunshine early so its uinput devices exist before sway's libinput initialises.
-  # mkForce clears the graphical-session.target ordering the sunshine module adds;
-  # NixOS merges these into one unit file so the directives simply aren't generated.
-  # WAYLAND_DISPLAY is hardcoded so sunshine can connect once sway's socket appears.
-  systemd.user.services.sunshine = {
-    wantedBy = lib.mkForce [ "default.target" ];
-    after = lib.mkForce [];
-    wants = lib.mkForce [];
-    partOf = lib.mkForce [];
-    environment = {
-      WAYLAND_DISPLAY = "wayland-1";
-      XDG_RUNTIME_DIR = "/run/user/1000";
+  # When sunshine creates virtual input devices via uinput, the kernel fires the uevent
+  # in the host namespace so the container's udevd never sees it and libinput never
+  # discovers the devices. /sys/class/input/ is not namespace-scoped, so the devices are
+  # visible there regardless. udevadm trigger synthesises add-events from those sysfs
+  # entries, letting udevd notify libinput — no host-side changes required.
+  # Runs as root (required for udevadm trigger) and re-arms after each disappearance
+  # so that sunshine restarts are handled automatically.
+  systemd.services.sunshine-input-trigger = {
+    description = "Trigger udev input rescan when sunshine's virtual devices appear";
+    after = [ "systemd-udevd.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "on-failure";
+      ExecStart = pkgs.writeShellScript "sunshine-input-trigger" ''
+        while true; do
+          until grep -q "Keyboard passthrough" /proc/bus/input/devices 2>/dev/null; do
+            sleep 1
+          done
+          udevadm trigger --subsystem-match=input
+          udevadm settle
+          until ! grep -q "Keyboard passthrough" /proc/bus/input/devices 2>/dev/null; do
+            sleep 5
+          done
+        done
+      '';
     };
   };
 
@@ -157,20 +158,13 @@ in
   # swaylock authenticates via PAM; without this service definition it can never unlock.
   security.pam.services.swaylock = { };
 
-  # seatd gives the libinput backend a way to open /dev/input/* without logind, which
-  # does not work in an LXC container. SEATD_VTBOUND=0 disables VT management, which the
-  # container has no /dev/tty0 for, so seatd can open a seat headlessly.
-  services.seatd.enable = true;
-  systemd.services.seatd.environment.SEATD_VTBOUND = "0";
-
-
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
     extraSessionCommands = ''
       export WLR_BACKENDS=headless,libinput
       export WLR_RENDER_DRM_DEVICE=/dev/dri/renderD128
-      export LIBSEAT_BACKEND=seatd
+      export LIBSEAT_BACKEND=noop
       export WLR_LIBINPUT_NO_DEVICES=1
       export PATH=/run/current-system/sw/bin:/run/wrappers/bin:$PATH
     '';
@@ -195,7 +189,6 @@ in
       "docker"
       "input"  # Needed for libinput to open /dev/input/* devices.
       "render"
-      "seat"   # Needed for seatd access.
       "uinput" # Needed for sunshine remote input.
       "video"
     ];
