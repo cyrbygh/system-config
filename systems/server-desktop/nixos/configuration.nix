@@ -128,7 +128,7 @@ in
     wrapperFeatures.gtk = true;
     extraSessionCommands = ''
       export WLR_BACKENDS=headless
-      export WLR_RENDER_DRM_DEVICE=/dev/dri/renderD128
+      export WLR_RENDERER=pixman
       export PATH=/run/current-system/sw/bin:/run/wrappers/bin:$PATH
     '';
   };
