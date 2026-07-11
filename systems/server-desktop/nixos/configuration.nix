@@ -129,9 +129,11 @@ in
   # swaylock authenticates via PAM; without this service definition it can never unlock.
   security.pam.services.swaylock = { };
 
-  # seatd gives the libinput backend a way to open /dev/input/* without logind,
-  # which doesn't work in an LXC container.
+  # seatd gives the libinput backend a way to open /dev/input/* without logind, which
+  # does not work in an LXC container. SEATD_VTBOUND=0 disables VT management, which the
+  # container has no /dev/tty0 for, so seatd can open a seat headlessly.
   services.seatd.enable = true;
+  systemd.services.seatd.environment.SEATD_VTBOUND = "0";
 
   programs.sway = {
     enable = true;
