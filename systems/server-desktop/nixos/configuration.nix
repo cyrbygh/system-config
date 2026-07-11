@@ -129,11 +129,15 @@ in
   # swaylock authenticates via PAM; without this service definition it can never unlock.
   security.pam.services.swaylock = { };
 
+  # seatd gives the libinput backend a way to open /dev/input/* without logind,
+  # which doesn't work in an LXC container.
+  services.seatd.enable = true;
+
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
     extraSessionCommands = ''
-      export WLR_BACKENDS=headless
+      export WLR_BACKENDS=headless,libinput
       export WLR_RENDER_DRM_DEVICE=/dev/dri/renderD128
       export PATH=/run/current-system/sw/bin:/run/wrappers/bin:$PATH
     '';
@@ -156,7 +160,9 @@ in
       "cdrom"
       "dialout"
       "docker"
+      "input"  # Needed for libinput to open /dev/input/* devices.
       "render"
+      "seat"   # Needed for seatd access.
       "uinput" # Needed for sunshine remote input.
       "video"
     ];
