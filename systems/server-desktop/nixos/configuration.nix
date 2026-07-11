@@ -103,11 +103,13 @@ in
     };
   };
 
-  # sway's config activates graphical-session.target once the compositor is up. Binding
-  # it to sway.service makes the target, and every service that is PartOf it, stop when
-  # sway stops or restarts, so the whole session recovers together.
+  # sway is the only compositor on this machine, so graphical-session.target's
+  # RefuseManualStart restriction serves no purpose here. Override it so sway's
+  # config can start the target directly. bindsTo sway.service so the whole
+  # session tears down when sway stops or restarts.
   systemd.user.targets.graphical-session = {
     overrideStrategy = "asDropin";
+    unitConfig.RefuseManualStart = false;
     bindsTo = [ "sway.service" ];
     after = [ "sway.service" ];
   };

@@ -129,4 +129,4 @@ input * {
 # Publish sway's runtime environment to the systemd user manager, then bring up the
 # session target. Services are ordered after the import so they inherit WAYLAND_DISPLAY
 # and SWAYSOCK.
-exec sh -c 'systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK && systemctl --user start graphical-session.target'
+exec sh -c 'systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK && systemctl --user --no-block start graphical-session.target'
