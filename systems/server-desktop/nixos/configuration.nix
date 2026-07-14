@@ -50,15 +50,9 @@ in
 
   networking.hostName = "server-desktop";
 
-  # proxmox-lxc.nix sets boot.isContainer = true but the shared config enables
-  # systemd-boot, which conflicts.
-  boot.loader.systemd-boot.enable = lib.mkForce false;
-  boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
+  services.qemuGuest.enable = true;
 
-  hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs; [ intel-media-driver ];
-  };
+  hardware.graphics.enable = true;
 
   services.pipewire = {
     enable = true;
@@ -94,11 +88,11 @@ in
     GTK_THEME = "Adwaita-dark";
   };
 
-  # greetd requires VT/KMS ioctls which LXC containers don't support.
+  # We manage the session via a linger user service rather than a greeter.
   services.greetd.enable = lib.mkForce false;
 
-  # Linger starts muser's systemd instance at boot, which creates
-  # XDG_RUNTIME_DIR and runs user services (pam_systemd fails in this container).
+  # Linger starts muser's systemd instance at boot, which creates XDG_RUNTIME_DIR
+  # and runs user services without requiring an interactive login.
   users.users.muser.linger = true;
 
   systemd.user.services.sway = {
@@ -108,7 +102,6 @@ in
       Restart = "on-failure";
     };
   };
-
 
   # sway is the only compositor on this machine, so graphical-session.target's
   # RefuseManualStart restriction serves no purpose here. Override it so sway's
@@ -152,15 +145,6 @@ in
         undo = "${lockSession}";
       }
     ];
-  };
-
-  # systemd-udevd refuses to start when /sys is read-only (the default in LXC containers).
-  # Clearing the condition lets it run — it doesn't need to write to sysfs for our use
-  # case; it just needs to receive kernel uevents via netlink and forward them to libudev
-  # monitors, which is what libinput uses to discover new input devices.
-  systemd.services.systemd-udevd = {
-    overrideStrategy = "asDropin";
-    unitConfig.ConditionPathIsReadWrite = "";
   };
 
   users.users.muser = {
