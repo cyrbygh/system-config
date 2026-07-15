@@ -1,5 +1,45 @@
 { config, lib, pkgs, ... }:
 
+let
+  # Background color swaylock shows while locked.
+  lockColor = "34495e";
+
+  # Resize the headless output to the connecting Moonlight client, matching refresh
+  # rate when sunshine provides one.
+  resizeToClient = pkgs.writeShellScript "sunshine-resize-to-client" ''
+    if [ -n "$SUNSHINE_CLIENT_FPS" ]; then
+      ${pkgs.sway}/bin/swaymsg output HEADLESS-1 mode "$SUNSHINE_CLIENT_WIDTH"x"$SUNSHINE_CLIENT_HEIGHT"@"$SUNSHINE_CLIENT_FPS"Hz
+    else
+      ${pkgs.sway}/bin/swaymsg output HEADLESS-1 resolution "$SUNSHINE_CLIENT_WIDTH"x"$SUNSHINE_CLIENT_HEIGHT"
+    fi
+  '';
+
+  # Lock the session on disconnect unless it is already locked. Moonlight pairing is the
+  # only other gate, so this leaves a password prompt behind for the next client.
+  lockSession = pkgs.writeShellScript "sunshine-lock" ''
+    ${pkgs.procps}/bin/pgrep -x swaylock > /dev/null || ${pkgs.swaylock}/bin/swaylock -f -c ${lockColor}
+  '';
+
+  # swayidle locks after a short idle and blanks the headless output after a longer one.
+  swayidleCmd = pkgs.writeShellScript "swayidle-session" ''
+    exec ${pkgs.swayidle}/bin/swayidle \
+      timeout 60 '${pkgs.swaylock}/bin/swaylock -f -c ${lockColor}' \
+      timeout 120 '${pkgs.sway}/bin/swaymsg "output * dpms off"' \
+      resume '${pkgs.sway}/bin/swaymsg "output * dpms on"'
+  '';
+
+  # Wiring shared by every service that belongs to the sway graphical session.
+  mkSessionService = description: execStart: {
+    inherit description;
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    wantedBy = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = execStart;
+      Restart = "on-failure";
+    };
+  };
+in
 {
   imports =
     [
@@ -63,6 +103,24 @@
     };
   };
 
+  # sway's config activates graphical-session.target once the compositor is up. Binding
+  # it to sway.service makes the target, and every service that is PartOf it, stop when
+  # sway stops or restarts, so the whole session recovers together.
+  systemd.user.targets.graphical-session = {
+    overrideStrategy = "asDropin";
+    bindsTo = [ "sway.service" ];
+    after = [ "sway.service" ];
+  };
+
+  # Session helpers. Each waits for graphical-session.target, so WAYLAND_DISPLAY and
+  # SWAYSOCK have already been imported, and stops with it.
+  systemd.user.services.swayidle = mkSessionService "Idle locking and output blanking" "${swayidleCmd}";
+  systemd.user.services.mako = mkSessionService "Notification daemon" "${pkgs.mako}/bin/mako";
+  systemd.user.services.waybar = mkSessionService "Status bar" "${pkgs.waybar}/bin/waybar";
+
+  # swaylock authenticates via PAM; without this service definition it can never unlock.
+  security.pam.services.swaylock = { };
+
   programs.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
@@ -75,23 +133,15 @@
 
   services.sunshine = {
     enable = true;
+    # Runs for every stream, including the built-in Desktop. do resizes the output to the
+    # client; undo locks the session on disconnect so the next client hits a password prompt.
+    settings.global_prep_cmd = builtins.toJSON [
+      {
+        do = "${resizeToClient}";
+        undo = "${lockSession}";
+      }
+    ];
   };
-
-  # sunshine needs WAYLAND_DISPLAY from the sway session. Rather than relying on
-  # import-environment, set it directly and declare the sway dependency so systemd
-  # starts sunshine after sway creates the Wayland socket.
-  systemd.user.services.sunshine = {
-    after = [ "sway.service" ];
-    bindsTo = [ "sway.service" ];
-    wantedBy = [ "sway.service" ];
-    serviceConfig = {
-      Environment = "WAYLAND_DISPLAY=wayland-1";
-    };
-  };
-
-  # Necessary for remote input to work with sunshine.
-  # Proxmox host must pass through /dev/uinput to the container.
-  hardware.uinput.enable = true;
 
   users.users.muser = {
     extraGroups = lib.mkAfter [
@@ -99,7 +149,7 @@
       "dialout"
       "docker"
       "render"
-      "uinput"
+      "uinput" # Needed for sunshine remote input.
       "video"
     ];
   };

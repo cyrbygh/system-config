@@ -89,8 +89,9 @@ bindsym $mod+Shift+0 move container to workspace 10
 # Lock the screen.
 bindsym $mod+Shift+Ctrl+l exec "swaylock -c 34495e"
 
-# Reload the configuration file.
-bindsym $mod+Shift+c reload
+# Reload the configuration file, and restart the bar and notification daemon so their
+# own config changes take effect at the same time.
+bindsym $mod+Shift+c reload; exec systemctl --user restart waybar mako
 
 # Restart sway in place.
 bindsym $mod+Shift+r restart
@@ -121,20 +122,11 @@ output "*" background '#0a3d62' solid_color
 
 seat * xcursor_theme Adwaita 20
 
-bar swaybar_command waybar
-
 input * {
     xkb_options compose:ralt
 }
 
-exec mako
-
-exec swayidle \
-    timeout 60 'swaylock -c 34495e' \
-    timeout 120 'swaymsg "output * dpms off"' \
-        resume 'swaymsg "output * dpms on"'
-
-# import-environment must finish before sunshine starts so that WAYLAND_DISPLAY
-# is in the user systemd manager environment — both commands run concurrently
-# otherwise and sunshine loses the race.
-exec sh -c 'systemctl --user import-environment && systemctl --user start sunshine'
+# Publish sway's runtime environment to the systemd user manager, then bring up the
+# session target. Services are ordered after the import so they inherit WAYLAND_DISPLAY
+# and SWAYSOCK.
+exec sh -c 'systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK && systemctl --user start graphical-session.target'
