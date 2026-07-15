@@ -5,12 +5,17 @@ let
   lockColor = "34495e";
 
   # Resize the headless output to the connecting Moonlight client, matching refresh
-  # rate when sunshine provides one.
+  # rate when sunshine provides one. Scale 2 at 1440p or higher, otherwise 1.
   resizeToClient = pkgs.writeShellScript "sunshine-resize-to-client" ''
     if [ -n "$SUNSHINE_CLIENT_FPS" ]; then
       ${pkgs.sway}/bin/swaymsg output HEADLESS-1 mode "$SUNSHINE_CLIENT_WIDTH"x"$SUNSHINE_CLIENT_HEIGHT"@"$SUNSHINE_CLIENT_FPS"Hz
     else
       ${pkgs.sway}/bin/swaymsg output HEADLESS-1 resolution "$SUNSHINE_CLIENT_WIDTH"x"$SUNSHINE_CLIENT_HEIGHT"
+    fi
+    if [ "$SUNSHINE_CLIENT_HEIGHT" -ge 1440 ]; then
+      ${pkgs.sway}/bin/swaymsg output HEADLESS-1 scale 2
+    else
+      ${pkgs.sway}/bin/swaymsg output HEADLESS-1 scale 1
     fi
     sleep 0.5
   '';
