@@ -51,6 +51,8 @@
 
   programs.zsh.enable = true;
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # Helps enable realtime scheduling for unprivileged programs.
   security.rtkit.enable = true;
 }

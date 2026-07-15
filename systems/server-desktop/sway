@@ -1,12 +1,9 @@
 set $mod Mod4
 
-# Font for window titles. This will also be used by the bar unless a different font is used in the bar {} block below.
-# This font is widely installed, provides lots of Unicode glyphs, supports right-to-left text rendering, and scales well on retina/HiDPI displays (thanks to pango).
 font pango:Noto Sans Mono 10
 titlebar_border_thickness 0
 titlebar_padding 4 1
 
-# Use Mouse+$mod to drag floating windows to their desired position.
 floating_modifier $mod
 
 # Start a terminal.
@@ -92,68 +89,44 @@ bindsym $mod+Shift+0 move container to workspace 10
 # Lock the screen.
 bindsym $mod+Shift+Ctrl+l exec "swaylock -c 34495e"
 
-# Lock and suspend the system.
-bindsym $mod+Shift+Ctrl+s exec "swaylock --daemonize -c 34495e && systemctl suspend"
+# Reload the configuration file, and restart the bar and notification daemon so their
+# own config changes take effect at the same time.
+bindsym $mod+Shift+c reload; exec systemctl --user restart waybar mako
 
-# Reload the configuration file.
-bindsym $mod+Shift+c reload
-
-# Restart sway in place (preserves your layout/session and can be used to upgrade sway).
+# Restart sway in place.
 bindsym $mod+Shift+r restart
 
-# Exit Sway (logs you out of your Wayland session).
+# Exit sway.
 bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
 
-# Resize windows (you can also use the mouse for this).
+# Resize windows.
 mode "resize" {
-    # These bindings trigger as soon as you enter resize mode.
-
-    # Pressing left shrinks the window width.
-    # Pressing right grows the window width.
-    # Pressing up shrinks the window height.
-    # Pressing down grows the window height.
     bindsym j resize shrink width 10 px or 10 ppt
     bindsym k resize grow height 10 px or 10 ppt
     bindsym l resize shrink height 10 px or 10 ppt
     bindsym semicolon resize grow width 10 px or 10 ppt
 
-    # Use the same bindings for the arrow keys.
     bindsym Left resize shrink width 10 px or 10 ppt
     bindsym Down resize grow height 10 px or 10 ppt
     bindsym Up resize shrink height 10 px or 10 ppt
     bindsym Right resize grow width 10 px or 10 ppt
 
-    # Return to normal mode using Enter or Escape.
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
+
+bindsym $mod+r mode "resize"
+
+output HEADLESS-1 resolution 1920x1080 position 0,0
+output "*" background '#0a3d62' solid_color
+
+seat * xcursor_theme Adwaita 20
 
 input * {
     xkb_options compose:ralt
 }
 
-bindsym $mod+r mode "resize"
-
-#output "*" disable
-output "*" background '#0a3d62' solid_color
-#output "DP-1" enable
-output "*" scale 2
-
-# Make the cursor not the size of an atom.
-seat * xcursor_theme Adwaita 20
-
-bar swaybar_command waybar
-
-# Fix GTK apps somehow.
-exec systemctl --user import-environment
-
-# Desktop notifications.
-exec mako
-
-# Automatically lock the screen and eventually suspend.
-exec swayidle \
-    timeout 60 'swaylock -c 34495e' \
-    timeout 120 'swaymsg "output * dpms off"' \
-        resume 'swaymsg "output * dpms on"' \
-    timeout 600 'systemctl suspend'
-
+# Publish sway's runtime environment to the systemd user manager, then bring up the
+# session target. Services are ordered after the import so they inherit WAYLAND_DISPLAY
+# and SWAYSOCK.
+exec sh -c 'systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK && systemctl --user --no-block start graphical-session.target'
