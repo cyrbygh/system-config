@@ -50,7 +50,7 @@ in
   imports =
     [
       ./hardware-configuration.nix
-      ../../_shared/nixos/configuration.nix
+      ../../_shared/nixos/base.nix
     ];
 
   networking.hostName = "server-desktop";

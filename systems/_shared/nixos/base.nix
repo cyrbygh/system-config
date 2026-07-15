@@ -43,7 +43,6 @@
     htop
     tree
     unzip
-    usbutils
     vim
     wget
     xz
