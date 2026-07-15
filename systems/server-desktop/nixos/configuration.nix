@@ -52,6 +52,11 @@ in
 
   services.qemuGuest.enable = true;
 
+  # Recovery console over the VM's serial port (qm terminal). Serial has no KMS scanout,
+  # unlike an emulated display, so sunshine keeps capturing sway's headless output rather
+  # than grabbing a console framebuffer.
+  boot.kernelParams = [ "console=tty1" "console=ttyS0,115200" ];
+
   hardware.graphics.enable = true;
 
   # amdgpu is in-kernel but loads its microcode from linux-firmware at probe time.
@@ -102,6 +107,10 @@ in
   systemd.user.services.sway = {
     wantedBy = [ "default.target" ];
     serviceConfig = {
+      # amdgpu can finish probing after this user service would otherwise start. Without
+      # the render node, sway silently falls back to the pixman software renderer, which
+      # only exports SHM and breaks sunshine's dmabuf capture. Wait for the node first.
+      ExecStartPre = "${pkgs.coreutils}/bin/timeout 30 ${pkgs.bash}/bin/sh -c 'until test -e /dev/dri/renderD128; do sleep 0.2; done'";
       ExecStart = "${config.programs.sway.package}/bin/sway";
       Restart = "on-failure";
     };
