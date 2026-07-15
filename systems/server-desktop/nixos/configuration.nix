@@ -54,6 +54,10 @@ in
 
   hardware.graphics.enable = true;
 
+  # amdgpu is in-kernel but loads its microcode from linux-firmware at probe time.
+  # Without this the 6700XT (Navi 22) fails to initialize and no /dev/dri appears.
+  hardware.enableRedistributableFirmware = true;
+
   services.pipewire = {
     enable = true;
     pulse.enable = true;
