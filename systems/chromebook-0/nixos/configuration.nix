@@ -56,5 +56,13 @@
     '')
   ];
 
+  # Suspend on lid close on battery and AC alike, so closing the lid resets to the greetd
+  # prompt like the power button does. Both already default to suspend; set explicitly for
+  # intent.
+  services.logind.settings.Login = {
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchExternalPower = "suspend";
+  };
+
   system.stateVersion = "26.05";
 }

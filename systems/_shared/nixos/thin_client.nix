@@ -20,6 +20,29 @@
   # Cage relies on polkit to authorize VT switching.
   security.polkit.enable = true;
 
+  # Suspend on a short power button press rather than powering off. Since moonlight grabs the
+  # keyboard, the power button is the only practical local sleep and wake control.
+  services.logind.settings.Login.HandlePowerKey = "suspend";
+
+  # Keep a bumped mouse or stray keypress from resuming the machine. Wake it with the power
+  # button instead.
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{power/wakeup}="disabled"
+  '';
+
+  # Tear down the cage session as the machine sleeps so it wakes at the greetd login prompt
+  # rather than resuming the old moonlight session. greetd returns to the greeter once the
+  # session exits, and killing cage takes its moonlight child with it. The leading dash
+  # ignores a nonzero exit when no session is running.
+  systemd.services.reset-session-on-sleep = {
+    before = [ "sleep.target" ];
+    wantedBy = [ "sleep.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "-${pkgs.procps}/bin/pkill -x cage";
+    };
+  };
+
   environment.systemPackages = lib.mkAfter (with pkgs; [
     cage
     moonlight-qt
