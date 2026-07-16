@@ -26,6 +26,8 @@
      KEYBOARD_KEY_b0=f10
   '';
 
+  # NetworkManager instead of networkd for nmtui and other wifi utilities.
+  networking.useNetworkd = false;
   networking.networkmanager.enable = true;
 
   networking.wg-quick.interfaces.wg0.configFile = "/home/muser/.system-config/systems/current/wg0.conf.decrypted";
