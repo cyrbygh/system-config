@@ -115,7 +115,8 @@ function crypt {
                 return 1
             fi
 
-            existing_decrypted="$(cat "${decrypted_file}" || echo "")"
+            existing_decrypted=""
+            [[ -f "${decrypted_file}" ]] && existing_decrypted="$(cat "${decrypted_file}")"
 
             echo "Decrypting [$(nicepath "${encrypted_file}")] -> [$(nicepath "${decrypted_file}")]."
 
