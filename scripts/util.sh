@@ -11,8 +11,13 @@ function abspath {
 }
 
 function crypt-link {
-    crypt "${1}"
-    link "${1}.decrypted" "${2}"
+    if [[ "${_SYSTEM_OP}" == "uninstall" ]]; then
+        link "${1}.decrypted" "${2}"
+        crypt "${1}"
+    else
+        crypt "${1}"
+        link "${1}.decrypted" "${2}"
+    fi
 }
 
 # The directory of the system config repo.
