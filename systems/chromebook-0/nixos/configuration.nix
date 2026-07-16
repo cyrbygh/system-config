@@ -6,22 +6,14 @@
       ./hardware-configuration.nix
       ../../_shared/nixos/base.nix
       ../../_shared/nixos/thin_client.nix
-      ../../_shared/nixos/wireguard.nix
     ];
 
   networking.hostName = "chromebook-0";
 
-  # Placeholder slot, replace with this client's assigned address.
-  wireguardClient.slot = 1;
+  networking.networkmanager.enable = true;
 
-  # iwd manages wifi. Networks are picked from a terminal by running iwctl.
-  networking.wireless.iwd.enable = true;
-
-  # networkd handles addressing on the wireless link once iwd associates.
-  systemd.network.networks."40-wireless" = {
-    matchConfig.Type = "wlan";
-    networkConfig.DHCP = "yes";
-  };
+  networking.wg-quick.interfaces.wg0.configFile = "/home/muser/.system-config/systems/current/wg0.conf.decrypted";
+  users.users.muser.extraGroups = [ "networkmanager" ];
 
   # Intel iGPU (Celeron N4000). The media driver gives moonlight VAAPI accelerated decode, and
   # iHD is the driver name libva looks up at runtime.

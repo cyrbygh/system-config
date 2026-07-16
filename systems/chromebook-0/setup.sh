@@ -10,5 +10,5 @@ popd > /dev/null
 link ../_shared/env/nixos ~/.env/nixos
 link ../_shared/gitconfig ~/.gitconfig
 
-crypt ./wg/host
-crypt ./wg/private_key
+crypt ./wg0.conf
+
