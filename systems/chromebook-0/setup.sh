@@ -12,3 +12,6 @@ link ../_shared/gitconfig ~/.gitconfig
 
 crypt ./wg0.conf
 
+crypt-link ./ssh/id_ed25519 ~/.ssh/id_ed25519
+link ./ssh/id_ed25519.pub ~/.ssh/id_ed25519.pub
+
