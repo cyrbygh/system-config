@@ -4,11 +4,13 @@ let
   # The cage session runs swayidle next to moonlight so the machine suspends after a stretch
   # with no local input, for example once the stream drops and nobody is around. moonlight
   # inhibits idle while actively streaming and cage forwards that to the idle notifier, so this
-  # only fires when the stream is idle. exec hands the foreground to moonlight so cage exits
-  # with it.
+  # only fires when the stream is idle. swayidle is killed when moonlight exits so cage loses
+  # its last Wayland client and exits, returning to the greetd login prompt.
   session = pkgs.writeShellScript "thin-client-session" ''
     ${pkgs.swayidle}/bin/swayidle -w timeout 120 '${pkgs.systemd}/bin/systemctl suspend' &
-    exec ${pkgs.moonlight-qt}/bin/moonlight
+    swayidle_pid=$!
+    ${pkgs.moonlight-qt}/bin/moonlight
+    kill "$swayidle_pid"
   '';
 in
 {
@@ -55,7 +57,7 @@ in
     wantedBy = [ "sleep.target" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "-${pkgs.procps}/bin/pkill -x cage";
+      ExecStart = "-${pkgs.procps}/bin/pkill -KILL -f 'cage -d -s'";
     };
   };
 
