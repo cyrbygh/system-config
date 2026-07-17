@@ -13,7 +13,7 @@
   # Remap the top row keys to F1-F10. Scancodes sourced from function_row_physmap.
   # The Search key already sends KEY_LEFTMETA so no remapping is needed for it.
   services.udev.extraHwdb = ''
-    evdev:atkbd:dmi:bvn*:bvr*:bd*:svnGoogle:pnBobba:pvr*:rvn*:rn*:rvr*:
+    evdev:atkbd:dmi:bvn*:bvr*:bd*:svnGoogle:pnFleex:pvr*:rvn*:rn*:rvr*:
      KEYBOARD_KEY_ea=f1
      KEYBOARD_KEY_e9=f2
      KEYBOARD_KEY_e7=f3
