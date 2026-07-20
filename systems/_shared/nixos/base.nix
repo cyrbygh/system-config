@@ -9,11 +9,9 @@
   };
 
   networking = {
-    useNetworkd = true;
+    useNetworkd = lib.mkDefault true;
     firewall.enable = false;
   };
-
-  systemd.network.wait-online.enable = true;
 
   time.timeZone = "America/Los_Angeles";
 
@@ -43,7 +41,6 @@
     htop
     tree
     unzip
-    usbutils
     vim
     wget
     xz
