@@ -97,6 +97,11 @@ in
   # We manage the session via a linger user service rather than a greeter.
   services.greetd.enable = lib.mkForce false;
 
+  # Headless machine; VT gettys serve no purpose and are a security hole since
+  # uinput keystrokes from Sunshine leak to the VT layer. Serial getty (ttyS0)
+  # is unaffected and remains available for recovery via qm terminal.
+  systemd.suppressedSystemUnits = [ "getty@.service" ];
+
   # Linger starts muser's systemd instance at boot, which creates XDG_RUNTIME_DIR
   # and runs user services without requiring an interactive login.
   users.users.muser.linger = true;
