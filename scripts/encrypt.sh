@@ -17,17 +17,10 @@ fi
 # Resolve the symlink to get the actual system directory.
 CURRENT_SYSTEM_DIR="$(cd "${CURRENT_SYSTEM_DIR}" &> /dev/null && pwd)"
 
-# Check if encryption key exists when script is sourced.
-ENCRYPTION_KEY_PATH="${CURRENT_SYSTEM_DIR}/encryption_key"
-if [[ ! -f "${ENCRYPTION_KEY_PATH}" ]]; then
-    echo "Error: Encryption key not found at ${ENCRYPTION_KEY_PATH}."
-    exit 1
-fi
-
-# Check if decryption key exists when script is sourced.
-DECRYPTION_KEY_PATH="${CURRENT_SYSTEM_DIR}/decryption_key"
-if [[ ! -f "${DECRYPTION_KEY_PATH}" ]]; then
-    echo "Error: Decryption key not found at ${DECRYPTION_KEY_PATH}."
+# Check if age key exists when script is sourced.
+AGE_KEY_PATH="${CURRENT_SYSTEM_DIR}/age_key"
+if [[ ! -f "${AGE_KEY_PATH}" ]]; then
+    echo "Error: Age key not found at ${AGE_KEY_PATH}."
     exit 1
 fi
 
@@ -72,7 +65,7 @@ function crypt {
             if [[ -f "${encrypted_file}" ]]; then
                 # Decrypt existing encrypted file to compare.
                 local temp_decrypted="${decrypted_file}.cmp"
-                if age -d -i "${DECRYPTION_KEY_PATH}" -o "${temp_decrypted}" "${encrypted_file}" 2>/dev/null; then
+                if age -d -i "${AGE_KEY_PATH}" -o "${temp_decrypted}" "${encrypted_file}" 2>/dev/null; then
                     if cmp -s "${decrypted_file}" "${temp_decrypted}"; then
                         needs_update=false
                     fi
@@ -89,7 +82,7 @@ function crypt {
                 fi
 
                 # Encrypt the file using age.
-                if ! age -R "${ENCRYPTION_KEY_PATH}" -o "${encrypted_file}" "${decrypted_file}"; then
+                if ! age -R <(age-keygen -y "${AGE_KEY_PATH}") -o "${encrypted_file}" "${decrypted_file}"; then
                     error " -> !! Failed to encrypt [${decrypted_file}] !!"
                     return 1
                 fi
@@ -127,7 +120,7 @@ function crypt {
             trap cleanup EXIT
 
             # Decrypt the file using age.
-            if ! age -d -i "${DECRYPTION_KEY_PATH}" -o "${decryption_tmp}" "${encrypted_file}"; then
+            if ! age -d -i "${AGE_KEY_PATH}" -o "${decryption_tmp}" "${encrypted_file}"; then
                 error " -> !! Failed to decrypt [${encrypted_file}] !!"
                 return 1
             fi
