@@ -113,17 +113,4 @@
       syntax on
     '';
   };
-
-  programs.nano = {
-    enable = true;
-    syntaxHighlight = true;
-    extraConfig = ''
-      set regexp
-      set tabsize 4
-      set tabstospaces
-      set nowrap
-      set softwrap
-      set const
-    '';
-  };
 }
