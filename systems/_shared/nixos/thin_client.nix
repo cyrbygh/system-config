@@ -61,6 +61,9 @@ in
     };
   };
 
+  # Skip the seatd backend (no daemon) so libseat goes straight to logind without flashing errors on screen.
+  environment.variables.LIBSEAT_BACKEND = "logind";
+
   environment.systemPackages = lib.mkAfter (with pkgs; [
     cage
     moonlight-qt
