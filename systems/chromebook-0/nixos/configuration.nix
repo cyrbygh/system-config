@@ -30,7 +30,20 @@
   networking.useNetworkd = false;
   networking.networkmanager.enable = true;
 
-  networking.wg-quick.interfaces.wg0.configFile = "/home/muser/.system-config/systems/current/wg0.conf.decrypted";
+  age.identityPaths = [ "/etc/age_key" ];
+  age.secrets.wg0-conf = {
+    file = ../secrets/wg0-conf.age;
+    owner = "muser";
+    mode = "0400";
+  };
+  age.secrets.ssh-key = {
+    file = ../secrets/ssh-key.age;
+    path = "/home/muser/.ssh/id_ed25519";
+    owner = "muser";
+    mode = "0600";
+  };
+
+  networking.wg-quick.interfaces.wg0.configFile = config.age.secrets.wg0-conf.path;
   users.users.muser.extraGroups = [ "networkmanager" ];
 
   # Intel iGPU (Celeron N4000). The media driver gives moonlight VAAPI accelerated decode, and
@@ -62,6 +75,12 @@
   services.logind.settings.Login = {
     HandleLidSwitch = "suspend";
     HandleLidSwitchExternalPower = "suspend";
+  };
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.muser = import ./home.nix;
   };
 
   system.stateVersion = "26.05";
