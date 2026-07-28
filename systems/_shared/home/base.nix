@@ -3,10 +3,6 @@
 {
   programs.git = {
     enable = true;
-    user = {
-      name = "Kerb Byqvist";
-      email = "cyrbygh@users.noreply.github.com";
-    };
     ignores = [
       ".idea/"
       ".DS_Store"
@@ -16,6 +12,10 @@
       ".claude/"
     ];
     settings = {
+      user = {
+        name = "Kerb Byqvist";
+        email = "cyrbygh@users.noreply.github.com";
+      };
       url."git@github.com:cyrbygh/".insteadOf = "https://github.com/cyrbygh/";
       commit.gpgsign = false;
     };
