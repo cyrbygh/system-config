@@ -3,8 +3,10 @@
 {
   programs.git = {
     enable = true;
-    userName = "Kerb Byqvist";
-    userEmail = "cyrbygh@users.noreply.github.com";
+    user = {
+      name = "Kerb Byqvist";
+      email = "cyrbygh@users.noreply.github.com";
+    };
     ignores = [
       ".idea/"
       ".DS_Store"
@@ -13,7 +15,7 @@
       "*.egg-info"
       ".claude/"
     ];
-    extraConfig = {
+    settings = {
       url."git@github.com:cyrbygh/".insteadOf = "https://github.com/cyrbygh/";
       commit.gpgsign = false;
     };
@@ -50,7 +52,7 @@
       dd    = "dd status=progress ";
       tmux  = "tmux -u";
     };
-    initExtra = ''
+    initContent = ''
       if [[ "$(uname -s)" =~ Darwin ]]; then
         alias ls='ls -G'
       else
