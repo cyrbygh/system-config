@@ -44,6 +44,16 @@
   };
 
   networking.wg-quick.interfaces.wg0.configFile = config.age.secrets.wg0-conf.path;
+
+  systemd.services.wg-quick-wg0 = {
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+    serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = "5s";
+    };
+  };
+
   users.users.muser.extraGroups = [ "networkmanager" ];
 
   # Intel iGPU (Celeron N4000). The media driver gives moonlight VAAPI accelerated decode, and
