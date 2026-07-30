@@ -8,6 +8,14 @@
 
   networking.hostName = "backup-0";
 
+  # BCM4360 needs the out-of-tree wl driver from broadcom_sta.
+  boot.kernelModules = [ "wl" ];
+  boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
+
+  networking.useNetworkd = false;
+  networking.networkmanager.enable = true;
+  users.users.muser.extraGroups = [ "networkmanager" ];
+
   age.identityPaths = [ "/etc/age_key" ];
   age.secrets.wg0-conf = {
     file = ../secrets/wg0-conf.age;
