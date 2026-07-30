@@ -8,7 +8,8 @@
 
   networking.hostName = "backup-0";
 
-  # BCM4360 needs the out-of-tree wl driver from broadcom_sta.
+  # BCM4360 needs the out-of-tree wl driver from broadcom_sta (unfree).
+  nixpkgs.config.allowUnfreePredicate = pkg: lib.getName pkg == "broadcom-sta";
   boot.kernelModules = [ "wl" ];
   boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
 
