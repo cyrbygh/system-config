@@ -33,7 +33,6 @@
   age.identityPaths = [ "/etc/age_key" ];
   age.secrets.wg0-conf = {
     file = ../secrets/wg0-conf.age;
-    owner = "muser";
     mode = "0400";
   };
   age.secrets.ssh-key = {
