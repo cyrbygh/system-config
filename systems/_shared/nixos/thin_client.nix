@@ -32,10 +32,6 @@ in
   # Cage relies on polkit to authorize VT switching.
   security.polkit.enable = true;
 
-  # Tell libseat to use logind as the seat backend. Without this it probes for
-  # seatd first, fails to connect, and cage cannot open the DRM device.
-  environment.variables.LIBSEAT_BACKEND = "logind";
-
   # Suspend on a short power button press rather than powering off. Since moonlight grabs the
   # keyboard, the power button is the only practical local sleep and wake control. IdleAction
   # covers the greetd prompt, which the session's swayidle does not, so a client left sitting
