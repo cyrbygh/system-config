@@ -21,10 +21,10 @@
   networking.hostId = "71f65a4d";
   services.zfs.autoScrub.enable = true;
 
-  #fileSystems."/backup" = {
-  #  device = "backup/data";
-  #  fsType = "zfs";
-  #};
+  fileSystems."/backup" = {
+    device = "backup/data";
+    fsType = "zfs";
+  };
 
   fileSystems."/" =
     { device = "/dev/disk/by-label/NIXROOT";
