@@ -81,6 +81,34 @@
   };
   users.groups.backup = {};
 
+  # Watchdog that restarts wg-quick-wg0 if the WireGuard tunnel has had no
+  # handshake in the last 5 minutes. Catches cases where routing is restored
+  # after disruption but wg-quick (a oneshot service) doesn't re-run.
+  systemd.services.wg-watchdog = {
+    script = ''
+      now=$(date +%s)
+      handshake=$(${pkgs.wireguard-tools}/bin/wg show wg0 latest-handshakes 2>/dev/null | awk '{print $2}')
+      if [ -z "$handshake" ] || [ "$handshake" -eq 0 ] || [ "$((now - handshake))" -gt 300 ]; then
+        echo "wg0 handshake stale or missing (last: ''${handshake:-none}), restarting wg-quick-wg0"
+        systemctl restart wg-quick-wg0
+      else
+        echo "wg0 handshake OK ($((now - handshake))s ago)"
+      fi
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+    };
+  };
+
+  systemd.timers.wg-watchdog = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "5m";
+      OnUnitActiveSec = "2m";
+    };
+  };
+
   environment.systemPackages = [ pkgs.mbuffer ];
 
   home-manager = {
