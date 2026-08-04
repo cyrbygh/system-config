@@ -50,6 +50,21 @@
     '';
   };
 
+  # Clears AFTERG3_EN (bit 0) in the Intel PCH GEN_PMCON_3 register so the
+  # machine boots when AC is restored after a power cut. The bit lives in the
+  # RTC well (CMOS-battery-backed) so it survives power loss, but Apple's EFI
+  # resets it to 1 on every graceful shutdown — hence this must run each boot.
+  # Mask form (0:1) touches only bit 0 and leaves the rest of the byte intact.
+  systemd.services.mac-power-on-after-loss = {
+    description = "Clear AFTERG3_EN so Mac Mini boots after AC restore";
+    wantedBy = [ "sysinit.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.pciutils}/bin/setpci -s 00:1f.0 0xa4.b=0:1";
+    };
+  };
+
   # Allow the backup user to receive ZFS snapshots without root.
   # create/mount are needed for new datasets; rollback for -F receives.
   systemd.services.zfs-backup-permissions = {
