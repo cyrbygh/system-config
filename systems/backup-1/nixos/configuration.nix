@@ -39,10 +39,10 @@
   # Hardware watchdog via Intel TCO. systemd feeds it every 15s; if systemd
   # hangs the machine resets after 30s. Also provides the cold-reset that
   # broadcom_sta needs when a warm reboot leaves the WiFi hardware in a bad state.
-  systemd.extraConfig = ''
-    RuntimeWatchdogSec=30
-    ShutdownWatchdogSec=10min
-  '';
+  systemd.settings.Manager = {
+    RuntimeWatchdogSec = "30";
+    ShutdownWatchdogSec = "10min";
+  };
 
   # Reload the wl driver if WiFi hasn't connected 2 minutes after boot —
   # broadcom_sta sometimes fails to initialise on a warm reboot and needs
