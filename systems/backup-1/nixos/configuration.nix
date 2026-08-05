@@ -11,7 +11,7 @@
   # BCM4360 needs the out-of-tree wl driver from broadcom_sta (unfree, insecure).
   nixpkgs.config.allowUnfreePredicate  = pkg: lib.getName pkg == "broadcom-sta";
   nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "broadcom-sta";
-  boot.kernelModules = [ "wl" ];
+  boot.kernelModules = [ "wl" "iTCO_wdt" ];
   boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
 
   networking.useNetworkd = false;
@@ -34,6 +34,39 @@
       Restart = "on-failure";
       RestartSec = "5s";
     };
+  };
+
+  # Hardware watchdog via Intel TCO. systemd feeds it every 15s; if systemd
+  # hangs the machine resets after 30s. Also provides the cold-reset that
+  # broadcom_sta needs when a warm reboot leaves the WiFi hardware in a bad state.
+  systemd.extraConfig = ''
+    RuntimeWatchdogSec=30
+    ShutdownWatchdogSec=10min
+  '';
+
+  # Reload the wl driver if WiFi hasn't connected 2 minutes after boot —
+  # broadcom_sta sometimes fails to initialise on a warm reboot and needs
+  # the module cycled to recover.
+  systemd.services.wifi-driver-recovery = {
+    script = ''
+      if ${pkgs.networkmanager}/bin/nmcli -t -f TYPE,STATE device | grep -q "wifi:connected"; then
+        echo "WiFi connected, no recovery needed"
+      else
+        echo "WiFi not connected after boot, reloading wl module"
+        ${pkgs.kmod}/bin/rmmod wl || true
+        ${pkgs.kmod}/bin/modprobe wl
+        systemctl restart NetworkManager
+      fi
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+    };
+  };
+
+  systemd.timers.wifi-driver-recovery = {
+    wantedBy = [ "timers.target" ];
+    timerConfig.OnBootSec = "2m";
   };
 
   services.greetd.enable = lib.mkForce false;
