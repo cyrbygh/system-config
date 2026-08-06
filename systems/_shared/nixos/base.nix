@@ -21,7 +21,7 @@
     enable = true;
     settings = {
       default_session = {
-        command = lib.mkDefault "${pkgs.tuigreet}/bin/tuigreet --time";
+        command = lib.mkDefault "${pkgs.tuigreet}/bin/tuigreet --time --kb-power 4";
         user = lib.mkDefault "greeter";
       };
     };
