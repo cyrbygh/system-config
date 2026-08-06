@@ -27,7 +27,7 @@ in
   # Keep the tuigreet login prompt, but drop the user straight into the cage session once they
   # authenticate. Cage's -d drops client side decorations and -s allows VT switching.
   services.greetd.settings.default_session.command =
-    "${pkgs.tuigreet}/bin/tuigreet --time --cmd '${pkgs.cage}/bin/cage -d -s -- ${session}'";
+    "${pkgs.tuigreet}/bin/tuigreet --time --kb-power 4 --cmd '${pkgs.cage}/bin/cage -d -s -- ${session}'";
 
   # Cage relies on polkit to authorize VT switching.
   security.polkit.enable = true;
