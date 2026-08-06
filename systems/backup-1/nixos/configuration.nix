@@ -44,30 +44,6 @@
     ShutdownWatchdogSec = "10min";
   };
 
-  # Reload the wl driver if WiFi hasn't connected 2 minutes after boot —
-  # broadcom_sta sometimes fails to initialise on a warm reboot and needs
-  # the module cycled to recover.
-  systemd.services.wifi-driver-recovery = {
-    script = ''
-      if ${pkgs.networkmanager}/bin/nmcli -t -f TYPE,STATE device | grep -q "wifi:connected"; then
-        echo "WiFi connected, no recovery needed"
-      else
-        echo "WiFi not connected after boot, reloading wl module"
-        ${pkgs.kmod}/bin/rmmod wl || true
-        ${pkgs.kmod}/bin/modprobe wl
-        systemctl restart NetworkManager
-      fi
-    '';
-    serviceConfig = {
-      Type = "oneshot";
-      User = "root";
-    };
-  };
-
-  systemd.timers.wifi-driver-recovery = {
-    wantedBy = [ "timers.target" ];
-    timerConfig.OnBootSec = "2m";
-  };
 
   services.greetd.enable = lib.mkForce false;
   services.openssh = {
@@ -129,31 +105,36 @@
   };
   users.groups.backup = {};
 
-  # Watchdog that restarts wg-quick-wg0 if the WireGuard tunnel has had no
-  # handshake in the last 5 minutes. Catches cases where routing is restored
-  # after disruption but wg-quick (a oneshot service) doesn't re-run.
-  systemd.services.wg-watchdog = {
+  # Pings the WireGuard server once per minute. After 30 consecutive failures
+  # (~30 min) the machine reboots — covers any combination of WiFi, driver,
+  # or tunnel failure without trying to patch individual components.
+  systemd.services.connectivity-watchdog = {
+    description = "Reboot after 10 consecutive minutes without WireGuard connectivity";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "wg-quick-wg0.service" ];
     script = ''
-      now=$(date +%s)
-      handshake=$(${pkgs.wireguard-tools}/bin/wg show wg0 latest-handshakes 2>/dev/null | awk '{print $2}')
-      if [ -z "$handshake" ] || [ "$handshake" -eq 0 ] || [ "$((now - handshake))" -gt 300 ]; then
-        echo "wg0 handshake stale or missing (last: ''${handshake:-none}), restarting wg-quick-wg0"
-        systemctl restart wg-quick-wg0
-      else
-        echo "wg0 handshake OK ($((now - handshake))s ago)"
-      fi
+      failures=0
+      while true; do
+        sleep 60
+        if ${pkgs.iputils}/bin/ping -c 1 -W 5 10.77.67.1 > /dev/null 2>&1; then
+          if [ "$failures" -gt 0 ]; then
+            echo "Connectivity restored after $failures consecutive failure(s)"
+            failures=0
+          fi
+        else
+          failures=$((failures + 1))
+          echo "No connectivity to WireGuard server ($failures/30)"
+          if [ "$failures" -ge 30 ]; then
+            echo "30 consecutive failures — rebooting"
+            systemctl reboot
+          fi
+        fi
+      done
     '';
     serviceConfig = {
-      Type = "oneshot";
-      User = "root";
-    };
-  };
-
-  systemd.timers.wg-watchdog = {
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnBootSec = "5m";
-      OnUnitActiveSec = "2m";
+      Type = "simple";
+      Restart = "on-failure";
+      RestartSec = "10s";
     };
   };
 
