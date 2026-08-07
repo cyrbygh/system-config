@@ -11,7 +11,7 @@
   # BCM4360 needs the out-of-tree wl driver from broadcom_sta (unfree, insecure).
   nixpkgs.config.allowUnfreePredicate  = pkg: lib.getName pkg == "broadcom-sta";
   nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "broadcom-sta";
-  boot.kernelModules = [ "wl" "iTCO_wdt" "applesmc" "coretemp" ];
+  boot.kernelModules = [ "wl" "iTCO_wdt" "applesmc" "coretemp" "drivetemp" ];
   boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
 
   networking.useNetworkd = false;
