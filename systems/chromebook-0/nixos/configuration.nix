@@ -4,7 +4,6 @@
   imports =
     [
       ./hardware-configuration.nix
-      ../../_shared/nixos/base.nix
       ../../_shared/nixos/thin_client.nix
     ];
 

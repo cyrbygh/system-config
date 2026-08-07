@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... }:
 
-let
-  # The cage session runs swayidle next to moonlight so the machine suspends after a stretch
+let  # The cage session runs swayidle next to moonlight so the machine suspends after a stretch
   # with no local input, for example once the stream drops and nobody is around. moonlight
   # inhibits idle while actively streaming and cage forwards that to the idle notifier, so this
   # only fires when the stream is idle. swayidle is killed when moonlight exits so cage loses
@@ -14,6 +13,8 @@ let
   '';
 in
 {
+  imports = [ ./base.nix ];
+
   # Cage needs a render device, so pull in the graphics stack. Systems built on top of this
   # base can append hardware specific drivers via hardware.graphics.extraPackages.
   hardware.graphics.enable = true;
