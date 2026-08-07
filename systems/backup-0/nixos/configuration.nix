@@ -11,7 +11,7 @@
   # BCM4360 needs the out-of-tree wl driver from broadcom_sta (unfree, insecure).
   nixpkgs.config.allowUnfreePredicate  = pkg: lib.getName pkg == "broadcom-sta";
   nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "broadcom-sta";
-  boot.kernelModules = [ "wl" ];
+  boot.kernelModules = [ "wl" "iTCO_wdt" "applesmc" "coretemp" "drivetemp" ];
   boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
 
   networking.useNetworkd = false;
@@ -33,6 +33,62 @@
     serviceConfig = {
       Restart = "on-failure";
       RestartSec = "5s";
+    };
+  };
+
+  # Hardware watchdog via Intel TCO. systemd feeds it every 15s; if systemd
+  # hangs the machine resets after 30s. Also provides the cold-reset that
+  # broadcom_sta needs when a warm reboot leaves the WiFi hardware in a bad state.
+  systemd.settings.Manager = {
+    RuntimeWatchdogSec = "30";
+    ShutdownWatchdogSec = "10min";
+  };
+
+  # Clears AFTERG3_EN (bit 0) in the Intel PCH GEN_PMCON_3 register so the
+  # machine boots when AC is restored after a power cut. The bit lives in the
+  # RTC well (CMOS-battery-backed) so it survives power loss. macOS resets it
+  # to 1 on graceful shutdown; NixOS does not, so in practice this is a no-op,
+  # but kept as a safety net. Mask form (0:1) touches only bit 0.
+  systemd.services.mac-power-on-after-loss = {
+    description = "Clear AFTERG3_EN so Mac Mini boots after AC restore";
+    wantedBy = [ "sysinit.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.pciutils}/bin/setpci -s 00:1f.0 0xa4.b=0:1";
+    };
+  };
+
+  # Pings the WireGuard server once per minute. After 30 consecutive failures
+  # (~30 min) the machine reboots — covers any combination of WiFi, driver,
+  # or tunnel failure without trying to patch individual components.
+  systemd.services.connectivity-watchdog = {
+    description = "Reboot after 30 consecutive minutes without WireGuard connectivity";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "wg-quick-wg0.service" ];
+    script = ''
+      failures=0
+      while true; do
+        sleep 60
+        if ${pkgs.iputils}/bin/ping -c 1 -W 5 10.77.67.1 > /dev/null 2>&1; then
+          if [ "$failures" -gt 0 ]; then
+            echo "Connectivity restored after $failures consecutive failure(s)"
+            failures=0
+          fi
+        else
+          failures=$((failures + 1))
+          echo "No connectivity to WireGuard server ($failures/30)"
+          if [ "$failures" -ge 30 ]; then
+            echo "30 consecutive failures — rebooting"
+            systemctl reboot
+          fi
+        fi
+      done
+    '';
+    serviceConfig = {
+      Type = "simple";
+      Restart = "on-failure";
+      RestartSec = "10s";
     };
   };
 
@@ -81,7 +137,19 @@
   };
   users.groups.backup = {};
 
-  environment.systemPackages = [ pkgs.mbuffer ];
+  environment.systemPackages = [ pkgs.mbuffer pkgs.lm_sensors ];
+
+  systemd.services.glances = {
+    description = "Glances system monitor REST API";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.glances}/bin/glances -w";
+      Restart = "on-failure";
+      RestartSec = "5s";
+    };
+  };
 
   home-manager = {
     useGlobalPkgs = true;
