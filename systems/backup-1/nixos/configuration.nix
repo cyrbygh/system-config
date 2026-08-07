@@ -59,11 +59,12 @@
     '';
   };
 
+
   # Clears AFTERG3_EN (bit 0) in the Intel PCH GEN_PMCON_3 register so the
   # machine boots when AC is restored after a power cut. The bit lives in the
-  # RTC well (CMOS-battery-backed) so it survives power loss, but Apple's EFI
-  # resets it to 1 on every graceful shutdown — hence this must run each boot.
-  # Mask form (0:1) touches only bit 0 and leaves the rest of the byte intact.
+  # RTC well (CMOS-battery-backed) so it survives power loss. macOS may reset it
+  # to 1 on graceful shutdown; NixOS does not, so in practice this is a no-op,
+  # but kept as a safety net. Mask form (0:1) touches only bit 0.
   systemd.services.mac-power-on-after-loss = {
     description = "Clear AFTERG3_EN so Mac Mini boots after AC restore";
     wantedBy = [ "sysinit.target" ];
