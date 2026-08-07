@@ -11,7 +11,7 @@
   # BCM4360 needs the out-of-tree wl driver from broadcom_sta (unfree, insecure).
   nixpkgs.config.allowUnfreePredicate  = pkg: lib.getName pkg == "broadcom-sta";
   nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "broadcom-sta";
-  boot.kernelModules = [ "wl" "iTCO_wdt" ];
+  boot.kernelModules = [ "wl" "iTCO_wdt" "applesmc" "coretemp" ];
   boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
 
   networking.useNetworkd = false;
@@ -138,7 +138,19 @@
     };
   };
 
-  environment.systemPackages = [ pkgs.mbuffer ];
+  environment.systemPackages = [ pkgs.mbuffer pkgs.lm_sensors ];
+
+  systemd.services.glances = {
+    description = "Glances system monitor REST API";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.glances}/bin/glances -w";
+      Restart = "on-failure";
+      RestartSec = "5s";
+    };
+  };
 
   home-manager = {
     useGlobalPkgs = true;
