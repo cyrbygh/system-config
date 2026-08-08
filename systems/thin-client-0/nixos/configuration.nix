@@ -1,14 +1,12 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports =
-    [
-      ./hardware-configuration.nix
-      ../../_shared/nixos/base.nix
-      ../../_shared/nixos/thin_client.nix
-    ];
+  imports = [
+    ./hardware-configuration.nix
+    ../../_shared/nixos/thin_client.nix
+  ];
 
-  networking.hostName = "office-thin-client";
+  networking.hostName = "thin-client-0";
 
   services.openssh = {
     enable = true;

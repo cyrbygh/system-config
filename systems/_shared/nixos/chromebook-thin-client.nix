@@ -1,41 +1,15 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports =
-    [
-      ./hardware-configuration.nix
-      ../../_shared/nixos/thin_client.nix
-    ];
+  imports = [ ./thin_client.nix ];
 
-  networking.hostName = "chromebook-1";
-
-  # Remap the top row keys to F1-F10. Scancodes sourced from function_row_physmap.
-  # The Search key already sends KEY_LEFTMETA so no remapping is needed for it.
-  services.udev.extraHwdb = ''
-    evdev:atkbd:dmi:bvn*:bvr*:bd*:svnGoogle:pnFleex:pvr*:rvn*:rn*:rvr*:
-     KEYBOARD_KEY_ea=f1
-     KEYBOARD_KEY_e9=f2
-     KEYBOARD_KEY_e7=f3
-     KEYBOARD_KEY_91=f4
-     KEYBOARD_KEY_92=f5
-     KEYBOARD_KEY_94=f6
-     KEYBOARD_KEY_95=f7
-     KEYBOARD_KEY_a0=f8
-     KEYBOARD_KEY_ae=f9
-     KEYBOARD_KEY_b0=f10
-  '';
-
-  # NetworkManager instead of networkd for nmtui and other wifi utilities.
   networking.useNetworkd = false;
   networking.networkmanager.enable = true;
+  users.users.muser.extraGroups = [ "networkmanager" ];
 
   age.identityPaths = [ "/etc/age_key" ];
-  age.secrets.wg0-conf = {
-    file = ../secrets/wg0-conf.age;
-    mode = "0400";
-  };
+  age.secrets.wg0-conf.mode = "0400";
   age.secrets.ssh-key = {
-    file = ../secrets/ssh-key.age;
     path = "/home/muser/.ssh/id_ed25519";
     owner = "muser";
     mode = "0600";
@@ -52,9 +26,7 @@
     };
   };
 
-  users.users.muser.extraGroups = [ "networkmanager" ];
-
-  # Intel iGPU (Celeron N4000). The media driver gives moonlight VAAPI accelerated decode, and
+  # Intel iGPU. The media driver gives moonlight VAAPI accelerated decode, and
   # iHD is the driver name libva looks up at runtime.
   hardware.graphics.extraPackages = with pkgs; [
     intel-media-driver
@@ -84,12 +56,4 @@
     HandleLidSwitch = "suspend";
     HandleLidSwitchExternalPower = "suspend";
   };
-
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users.muser = import ./home.nix;
-  };
-
-  system.stateVersion = "26.05";
 }
