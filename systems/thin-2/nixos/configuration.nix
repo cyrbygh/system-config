@@ -6,7 +6,7 @@
     ../../_shared/nixos/chromebook-thin-client.nix
   ];
 
-  networking.hostName = "thin-client-2";
+  networking.hostName = "thin-2";
 
   # Remap the top row keys to F1-F10. Scancodes sourced from function_row_physmap.
   # The Search key already sends KEY_LEFTMETA so no remapping is needed for it.

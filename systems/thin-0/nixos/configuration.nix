@@ -6,7 +6,7 @@
     ../../_shared/nixos/thin_client.nix
   ];
 
-  networking.hostName = "thin-client-0";
+  networking.hostName = "thin-0";
 
   services.openssh = {
     enable = true;
