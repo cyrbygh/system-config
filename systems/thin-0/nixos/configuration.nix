@@ -18,6 +18,10 @@
     ../../server-desktop/ssh/id_ed25519.pub
   ];
 
+  # Suspend on a short power button press. Since moonlight grabs the keyboard, the power button
+  # is the only practical local sleep and wake control.
+  services.logind.settings.Login.HandlePowerKey = "suspend";
+
   # Intel iGPU. The media driver gives moonlight VAAPI accelerated decode, and iHD is the
   # driver name libva looks up at runtime.
   hardware.graphics.extraPackages = with pkgs; [

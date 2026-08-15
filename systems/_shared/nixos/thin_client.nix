@@ -33,12 +33,9 @@ in
   # Cage relies on polkit to authorize VT switching.
   security.polkit.enable = true;
 
-  # Suspend on a short power button press rather than powering off. Since moonlight grabs the
-  # keyboard, the power button is the only practical local sleep and wake control. IdleAction
-  # covers the greetd prompt, which the session's swayidle does not, so a client left sitting
-  # at the greeter still suspends.
+  # IdleAction covers the greetd prompt, which the session's swayidle does not, so a client
+  # left sitting at the greeter still suspends.
   services.logind.settings.Login = {
-    HandlePowerKey = "suspend";
     IdleAction = "suspend";
     IdleActionSec = "2min";
   };
