@@ -126,7 +126,7 @@
     createHome = false;
     shell = pkgs.bash;
     openssh.authorizedKeys.keys = [
-      # TODO: home-server syncoid key
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEUY3/jST6nv6qDAiHYKRQxG4jpnkNFMcC9L9IEq/v2w"
     ];
   };
   users.groups.backup = {};
