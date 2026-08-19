@@ -125,7 +125,7 @@
   users.users.backup = {
     isSystemUser = true;
     group = "backup";
-    home = "/backup";
+    home = "/var/empty";
     createHome = false;
     shell = pkgs.bash;
     openssh.authorizedKeys.keys = [

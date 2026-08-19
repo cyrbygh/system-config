@@ -21,10 +21,6 @@
   networking.hostId = "542265e6";
   services.zfs.autoScrub.enable = true;
 
-  fileSystems."/backup" = {
-    device = "backup/data";
-    fsType = "zfs";
-  };
 
   fileSystems."/" =
     { device = "/dev/disk/by-label/NIXROOT";
