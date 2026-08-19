@@ -131,7 +131,11 @@
   };
   users.groups.backup = {};
 
-  environment.systemPackages = [ pkgs.mbuffer pkgs.lm_sensors ];
+  environment.systemPackages = with pkgs; [
+    lm_sensors
+    lzop
+    mbuffer
+  ];
 
   systemd.services.glances = {
     description = "Glances system monitor REST API";
