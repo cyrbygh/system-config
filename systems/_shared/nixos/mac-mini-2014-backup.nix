@@ -7,6 +7,9 @@
   nixpkgs.config.allowUnfreePredicate  = pkg: lib.getName pkg == "broadcom-sta";
   nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "broadcom-sta";
   boot.kernelModules = [ "wl" "iTCO_wdt" "applesmc" "coretemp" "drivetemp" ];
+
+  # Backup datasets are encrypted with keys this machine never holds; never prompt for them.
+  boot.zfs.requestEncryptionCredentials = false;
   boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
 
   networking.useNetworkd = false;
