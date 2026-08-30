@@ -18,6 +18,14 @@
     ../../server-desktop/ssh/id_ed25519.pub
   ];
 
+  age.identityPaths = [ "/etc/age_key" ];
+  age.secrets.ssh-key = {
+    file = ../secrets/ssh-key.age;
+    path = "/home/muser/.ssh/id_ed25519";
+    owner = "muser";
+    mode = "0600";
+  };
+
   # Suspend on a short power button press. Since moonlight grabs the keyboard, the power button
   # is the only practical local sleep and wake control.
   services.logind.settings.Login.HandlePowerKey = "suspend";
@@ -30,6 +38,12 @@
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD";
+  };
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.muser = import ./home.nix;
   };
 
   system.stateVersion = "26.05";
