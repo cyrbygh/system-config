@@ -8,16 +8,6 @@
 
   networking.hostName = "thin-0";
 
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-  };
-
-  # Authorize server-desktop's key so it can SSH in.
-  users.users.muser.openssh.authorizedKeys.keyFiles = [
-    ../../server-desktop/ssh/id_ed25519.pub
-  ];
-
   age.identityPaths = [ "/etc/age_key" ];
   age.secrets.ssh-key = {
     file = ../secrets/ssh-key.age;

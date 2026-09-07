@@ -33,6 +33,16 @@ in
   # Cage relies on polkit to authorize VT switching.
   security.polkit.enable = true;
 
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+  };
+
+  # Authorize server-desktop's key so it can SSH in.
+  users.users.muser.openssh.authorizedKeys.keyFiles = [
+    ../../server-desktop/ssh/id_ed25519.pub
+  ];
+
   # IdleAction covers the greetd prompt, which the session's swayidle does not, so a client
   # left sitting at the greeter still suspends.
   services.logind.settings.Login = {
