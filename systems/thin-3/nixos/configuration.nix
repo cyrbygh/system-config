@@ -16,6 +16,11 @@
     SUBSYSTEM=="input", ATTRS{name}=="Google Inc. Hammer", ATTRS{capabilities/abs}=="673800001000003", ENV{ID_INPUT_TOUCHPAD}="1", ENV{ID_INPUT_TOUCHSCREEN}=""
   '';
 
+  # AVS audio on Soraka requires UCM profiles to initialize the speaker amp and headphone
+  # routing. Without them PipeWire opens the PCM device but gets Broken pipe from the
+  # MAX98927 because the DSP signal path is never enabled.
+  environment.etc."alsa/ucm2".source = "${pkgs.alsa-ucm-conf}/share/alsa/ucm2";
+
   # Set pressure range and Chromebook model flag so libinput registers light touches.
   # AttrPressureRange matches the threshold used on other Hammer-based Chromebooks.
   environment.etc."libinput/local-overrides.quirks".text = ''
