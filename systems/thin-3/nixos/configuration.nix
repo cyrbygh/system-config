@@ -8,18 +8,24 @@
 
   networking.hostName = "thin-3";
 
-  # The HP Chromebook X2's Hammer keyboard touchpad advertises INPUT_PROP_DIRECT alongside
-  # INPUT_PROP_POINTER, causing libinput to classify it as a touchscreen rather than a
-  # touchpad. Unset DIRECT so libinput treats it as a pointer device and generates cursor
-  # motion instead of touch events.
+  # The HP Chromebook X2's Hammer keyboard touchpad reports INPUT_PROP_DIRECT alongside
+  # INPUT_PROP_POINTER, causing libinput to classify it as a touchscreen. Match the touchpad
+  # interface specifically via its ABS capabilities (distinct from the keyboard interface)
+  # and override the udev classification so libinput generates pointer events instead.
+  services.udev.extraRules = ''
+    SUBSYSTEM=="input", ATTRS{name}=="Google Inc. Hammer", ATTRS{capabilities/abs}=="673800001000003", ENV{ID_INPUT_TOUCHPAD}="1", ENV{ID_INPUT_TOUCHSCREEN}=""
+  '';
+
+  # Set pressure range and Chromebook model flag so libinput registers light touches.
+  # AttrPressureRange matches the threshold used on other Hammer-based Chromebooks.
   environment.etc."libinput/local-overrides.quirks".text = ''
     [HP Chromebook X2 Hammer Touchpad]
+    MatchUdevType=touchpad
     MatchName=Google Inc. Hammer
     MatchBus=usb
     MatchVendor=0x18D1
     MatchProduct=0x502B
     MatchDMIModalias=dmi:*svnGoogle:*pnSoraka*
-    AttrInputPropUnset=INPUT_PROP_DIRECT
     ModelChromebook=1
     AttrPressureRange=20:10
   '';
