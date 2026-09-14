@@ -11,6 +11,10 @@ let
         def __init__(self, args=None, config=None):
             super().__init__(args=args, config=config, stats_init_value=[])
             self.display_curse = False
+            # load_additional_plugins doesn't set disable_<name> in args the way
+            # load_plugins does for built-ins, so is_enabled() returns False.
+            if args and not hasattr(args, 'disable_' + self.plugin_name):
+                setattr(args, 'disable_' + self.plugin_name, False)
 
         @GlancesPluginModel._check_decorator
         @GlancesPluginModel._log_result_decorator
