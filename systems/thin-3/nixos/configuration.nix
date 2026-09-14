@@ -61,6 +61,11 @@ in
     AttrPressureRange=20:10
   '';
 
+  # Disable iwlmvm background scanning to eliminate periodic lag spikes during streaming.
+  # power_scheme=1 is CAM (Constantly Awake Mode); the default (2) runs roaming scans
+  # that briefly pause Tx and show up as ~1s lag every minute or two in moonlight.
+  boot.extraModprobeConfig = "options iwlmvm power_scheme=1";
+
   age.secrets.wg0-conf.file = ../secrets/wg0-conf.age;
   age.secrets.ssh-key.file = ../secrets/ssh-key.age;
 
