@@ -8,6 +8,13 @@ let  # The cage session runs swayidle next to moonlight so the machine suspends 
   session = pkgs.writeShellScript "thin-client-session" ''
     ${pkgs.swayidle}/bin/swayidle -w timeout 120 '${pkgs.systemd}/bin/systemctl suspend' &
     swayidle_pid=$!
+    # PipeWire takes a moment to finish device enumeration after login. SDL3 crashes
+    # (SIGSEGV in pthread_mutex_lock via SDL_AudioDeviceDisconnected_OnMainThread) if an
+    # audio device disconnect event fires while Moonlight is initializing the EGL renderer.
+    # Wait until PipeWire accepts connections before launching.
+    until ${pkgs.pipewire}/bin/pw-cli info >/dev/null 2>&1; do
+      sleep 0.2
+    done
     ${pkgs.moonlight-qt}/bin/moonlight
     kill "$swayidle_pid"
   '';
