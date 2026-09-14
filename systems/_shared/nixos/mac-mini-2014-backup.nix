@@ -1,5 +1,37 @@
 { config, lib, pkgs, ... }:
 
+let
+  zpoolPlugin = pkgs.writeTextDir "zpool/model.py" ''
+    """ZFS pool stats plugin for Glances."""
+    import subprocess
+    from glances.plugins.plugin.model import GlancesPluginModel
+
+
+    class PluginModel(GlancesPluginModel):
+        def __init__(self, args=None, config=None):
+            super().__init__(args=args, config=config, stats_init_value=[])
+            self.display_curse = False
+
+        @GlancesPluginModel._check_decorator
+        @GlancesPluginModel._log_result_decorator
+        def update(self):
+            stats = self.get_init_value()
+            if self.input_method == 'local':
+                try:
+                    out = subprocess.check_output(
+                        ['zpool', 'list', '-Hp', '-o', 'name,size,alloc'],
+                        timeout=5
+                    ).decode().strip()
+                    for line in out.splitlines():
+                        name, size, used = line.split('\t')
+                        stats.append({'name': name, 'size': int(size), 'used': int(used)})
+                except Exception:
+                    pass
+            self.stats = stats
+            return self.stats
+  '';
+in
+
 {
   imports = [ ./base.nix ];
 
@@ -147,7 +179,7 @@
     path = [ pkgs.zfs ];
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${pkgs.glances}/bin/glances -w";
+      ExecStart = "${pkgs.glances}/bin/glances -w -P ${zpoolPlugin}";
       Restart = "on-failure";
       RestartSec = "5s";
     };
