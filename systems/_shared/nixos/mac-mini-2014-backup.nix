@@ -144,6 +144,7 @@
     description = "Glances system monitor REST API";
     wantedBy = [ "multi-user.target" ];
     after = [ "network.target" ];
+    path = [ pkgs.zfs ];
     serviceConfig = {
       Type = "simple";
       ExecStart = "${pkgs.glances}/bin/glances -w";
