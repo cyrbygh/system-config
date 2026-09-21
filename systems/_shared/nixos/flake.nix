@@ -28,6 +28,7 @@
     nixosConfigurations = lib.genAttrs systemNames (name:
       nixpkgs.lib.nixosSystem {
         modules = [
+          { nixpkgs.overlays = [ agenix.overlays.default ]; }
           agenix.nixosModules.default
           home-manager.nixosModules.home-manager
           ../../${name}/nixos/configuration.nix
