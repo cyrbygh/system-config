@@ -35,8 +35,11 @@
     uid = 1000;
   };
 
+  age.identityPaths = [ "/etc/age_key" ];
+
   environment.systemPackages = with pkgs; [
     age
+    agenix
     git
     htop
     tree
@@ -47,6 +50,7 @@
   ];
 
   programs.zsh.enable = true;
+  programs.zsh.shellAliases.cryptedit = "agenix -i /etc/age_key -e";
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
