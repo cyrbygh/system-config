@@ -9,7 +9,6 @@ fi
 source ../../scripts/link.sh
 
 link ./gitignore ~/.gitignore
-link ./nanorc ~/.nanorc
 link ./tmux.conf ~/.tmux.conf
 link ./vimrc ~/.vimrc
 link ./../.. ~/.system-config

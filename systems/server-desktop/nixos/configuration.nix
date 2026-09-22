@@ -45,6 +45,13 @@ in
       ../../_shared/nixos/base.nix
     ];
 
+  age.secrets.ssh-key = {
+    file = ../secrets/ssh-key.age;
+    path = "/home/muser/.ssh/id_ed25519";
+    owner = "muser";
+    mode = "0600";
+  };
+
   networking.hostName = "server-desktop";
 
   services.qemuGuest.enable = true;
@@ -201,6 +208,12 @@ in
   virtualisation.docker.rootless = {
     enable = true;
     setSocketVariable = true;
+  };
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.muser = import ./home.nix;
   };
 
   system.stateVersion = "26.05";
