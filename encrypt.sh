@@ -49,6 +49,11 @@ else
   echo "Encrypting files for system configuration [${CURRENT_SYSTEM}]."
 fi
 
+if [[ ! -f "${CURRENT_SYSTEM_DIR}/setup.sh" ]]; then
+  echo "No setup.sh found; nothing to encrypt."
+  exit 0
+fi
+
 pushd "${CURRENT_SYSTEM_DIR}" > /dev/null
 
 if [[ "${check_only}" == true ]]; then
