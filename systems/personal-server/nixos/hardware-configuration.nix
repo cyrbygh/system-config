@@ -58,6 +58,16 @@ in
     fsType = "zfs";
   };
 
+  fileSystems."/var/lib/postgresql" = {
+    device = "ssds/var/lib/postgresql";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/vaultwarden" = {
+    device = "ssds/var/lib/vaultwarden";
+    fsType = "zfs";
+  };
+
   swapDevices = [];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

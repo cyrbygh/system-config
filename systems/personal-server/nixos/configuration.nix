@@ -5,6 +5,9 @@
     ./hardware-configuration.nix
     ../../_shared/nixos/base.nix
     ./networking.nix
+    ./services/postgres.nix
+    ./services/miniflux.nix
+    ./services/vaultwarden.nix
   ];
 
   networking.hostName = "personal-server";
