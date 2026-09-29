@@ -188,6 +188,9 @@ in {
     };
   };
 
+  # AdGuard handles all DNS; disable the stub resolver.
+  services.resolved.enable = false;
+
   # ── DNS: local resolver (dnsmasq) ─────────────────────────────────────────
   # Serves local hostnames from a generated hosts file on a loopback port.
   # AdGuard routes zone-suffix queries here so local lookups appear as
