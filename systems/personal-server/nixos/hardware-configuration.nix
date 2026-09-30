@@ -109,9 +109,9 @@ in
   };
 
   services.udev.extraRules = ''
-    SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="L1100FT6", ENV{MINOR}=="1", GROUP="dialout", MODE="0660", SYMLINK+="ttyZB0"
-    SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="L1100FT6", ENV{MINOR}=="2", GROUP="dialout", MODE="0660", SYMLINK+="ttyZB1"
-    SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="533D004242", GROUP="dialout", MODE="0660", SYMLINK+="ttyZW0"
+    SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="L1100FT6", ENV{MINOR}=="1", GROUP="dialout", MODE="0660", SYMLINK+="ttyZB0", TAG+="systemd"
+    SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="L1100FT6", ENV{MINOR}=="2", GROUP="dialout", MODE="0660", SYMLINK+="ttyZB1", TAG+="systemd"
+    SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="533D004242", GROUP="dialout", MODE="0660", SYMLINK+="ttyZW0", TAG+="systemd"
   '';
 
   swapDevices = [];
