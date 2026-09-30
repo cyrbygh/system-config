@@ -68,6 +68,16 @@ in
     fsType = "zfs";
   };
 
+  fileSystems."/var/lib/invidious" = {
+    device = "ssds/var/lib/invidious";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/invidious-companion" = {
+    device = "ssds/var/lib/invidious-companion";
+    fsType = "zfs";
+  };
+
   swapDevices = [];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

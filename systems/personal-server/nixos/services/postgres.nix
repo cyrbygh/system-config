@@ -11,13 +11,15 @@
       local all         postgres    peer
       local miniflux    miniflux    peer
       local vaultwarden vaultwarden peer
+      local invidious   invidious   peer
     '';
 
     ensureUsers = [
       { name = "miniflux";    ensureDBOwnership = true; }
       { name = "vaultwarden"; ensureDBOwnership = true; }
+      { name = "invidious";   ensureDBOwnership = true; }
     ];
 
-    ensureDatabases = [ "miniflux" "vaultwarden" ];
+    ensureDatabases = [ "miniflux" "vaultwarden" "invidious" ];
   };
 }

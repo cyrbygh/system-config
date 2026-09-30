@@ -119,7 +119,7 @@ in {
           iifname wan udp dport 68                         accept
           iifname wan icmp type echo-request               accept
           iifname wan ip saddr 10.215.50.0/24 accept                    # Mgmt network access during test period.
-          iifname wan ip saddr 10.215.30.3   tcp dport { 8080, 8000 } accept  # Traefik.
+          iifname wan ip saddr 10.215.30.3   tcp dport { 8000, 8080, 3001, 8282 } accept  # Traefik.
           iifname wan reject with icmpx admin-prohibited
         }
 
