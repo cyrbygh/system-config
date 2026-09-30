@@ -78,6 +78,19 @@ in
     fsType = "zfs";
   };
 
+  fileSystems."/var/lib/gonic" = {
+    device = "ssds/var/lib/gonic";
+    fsType = "zfs";
+  };
+
+  # noauto: key must be loaded manually (zfs load-key hdds/sensitive) before mounting.
+  # zfsutil must be explicit here since NixOS only infers it for auto-mounted datasets.
+  fileSystems."/hdds/sensitive/media/music" = {
+    device  = "hdds/sensitive/media/music";
+    fsType  = "zfs";
+    options = [ "noauto" "zfsutil" ];
+  };
+
   swapDevices = [];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

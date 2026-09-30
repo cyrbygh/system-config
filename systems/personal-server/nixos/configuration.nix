@@ -11,6 +11,8 @@
     ./services/invidious.nix
     ./services/wireguard.nix
     ./services/traefik.nix
+    ./services/gonic.nix
+    ./sensitive.nix
   ];
 
   networking.hostName = "personal-server";
