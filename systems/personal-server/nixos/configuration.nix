@@ -9,6 +9,7 @@
     ./services/miniflux.nix
     ./services/vaultwarden.nix
     ./services/invidious.nix
+    ./services/wireguard.nix
   ];
 
   networking.hostName = "personal-server";
