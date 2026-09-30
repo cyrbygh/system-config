@@ -18,5 +18,10 @@
     after   = [ "dev-ttyZW0.device" ];
   };
 
-  users.users.zwave-js.extraGroups = [ "dialout" ];
+  users.users.zwave-js = {
+    isSystemUser = true;
+    group        = "zwave-js";
+    extraGroups  = [ "dialout" ];
+  };
+  users.groups.zwave-js = {};
 }

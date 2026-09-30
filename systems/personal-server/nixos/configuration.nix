@@ -13,6 +13,7 @@
     ./services/traefik.nix
     ./services/mosquitto.nix
     ./services/zwave-js.nix
+    ./services/zigbee2mqtt.nix
     ./services/gonic.nix
     ./services/jellyfin.nix
     ./sensitive.nix
