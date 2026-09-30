@@ -113,6 +113,10 @@ in {
           # main and IoT: DNS and DHCP only
           iifname { main, iot } tcp dport 53               accept
           iifname { main, iot } udp dport { 53, 67 }       accept
+
+          # IoT: MQTT
+          iifname iot tcp dport 1883                        accept
+
           iifname { main, iot } reject with icmpx admin-prohibited
 
           # WAN: DHCP response + ICMP + SSH (from masqueraded router IP)
