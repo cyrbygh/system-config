@@ -8,6 +8,7 @@
     ./services/postgres.nix
     ./services/miniflux.nix
     ./services/vaultwarden.nix
+    ./services/invidious.nix
   ];
 
   networking.hostName = "personal-server";
