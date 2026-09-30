@@ -133,8 +133,9 @@ in {
           iifname mgmt                      accept
 
           # Internet access per VLAN (IoT is isolated by default)
-          iifname main  oifname wan         accept
-          iifname infra oifname wan         accept
+          iifname main    oifname wan       accept
+          iifname infra   oifname wan       accept
+          iifname podman0 oifname wan       accept
 
           # Infra can reach IoT
           iifname infra oifname iot         accept
@@ -190,6 +191,8 @@ in {
   };
 
   # AdGuard handles all DNS; disable the stub resolver.
+  # Point the host's resolv.conf at AdGuard so aardvark-dns (Podman) can forward external queries.
+  networking.nameservers = [ "127.0.0.1" ];
   services.resolved.enable = false;
 
   # ── DNS: local resolver (dnsmasq) ─────────────────────────────────────────
