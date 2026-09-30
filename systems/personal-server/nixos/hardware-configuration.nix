@@ -83,10 +83,27 @@ in
     fsType = "zfs";
   };
 
+  fileSystems."/var/lib/jellyfin" = {
+    device = "ssds/var/lib/jellyfin";
+    fsType = "zfs";
+  };
+
   # noauto: key must be loaded manually (zfs load-key hdds/sensitive) before mounting.
   # zfsutil must be explicit here since NixOS only infers it for auto-mounted datasets.
   fileSystems."/hdds/sensitive/media/music" = {
     device  = "hdds/sensitive/media/music";
+    fsType  = "zfs";
+    options = [ "noauto" "zfsutil" ];
+  };
+
+  fileSystems."/hdds/sensitive/media/movies" = {
+    device  = "hdds/sensitive/media/movies";
+    fsType  = "zfs";
+    options = [ "noauto" "zfsutil" ];
+  };
+
+  fileSystems."/hdds/sensitive/media/tv_shows" = {
+    device  = "hdds/sensitive/media/tv_shows";
     fsType  = "zfs";
     options = [ "noauto" "zfsutil" ];
   };
