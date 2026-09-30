@@ -12,6 +12,7 @@
     ./services/wireguard.nix
     ./services/traefik.nix
     ./services/mosquitto.nix
+    ./services/zwave-js.nix
     ./services/gonic.nix
     ./services/jellyfin.nix
     ./sensitive.nix

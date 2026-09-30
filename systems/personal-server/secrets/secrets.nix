@@ -5,4 +5,5 @@ in
 {
   "wg0-private-key.age".publicKeys    = [ personal-server server-desktop ];
   "traefik-acme-email.age".publicKeys = [ personal-server server-desktop ];
+  "zwave-keys.age".publicKeys         = [ personal-server server-desktop ];
 }
