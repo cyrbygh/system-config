@@ -15,7 +15,9 @@
 
       echo "Mounting sensitive datasets (services will start automatically)..."
       ${pkgs.systemd}/bin/systemctl start \
-        hdds-sensitive-media-music.mount
+        hdds-sensitive-media-music.mount \
+        hdds-sensitive-media-movies.mount \
+        hdds-sensitive-media-tv_shows.mount
       echo "Done."
     '')
   ];
