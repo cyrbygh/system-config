@@ -11,6 +11,7 @@
     ./services/invidious.nix
     ./services/wireguard.nix
     ./services/traefik.nix
+    ./services/mosquitto.nix
     ./services/gonic.nix
     ./services/jellyfin.nix
     ./sensitive.nix
