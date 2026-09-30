@@ -12,6 +12,16 @@
     };
   };
 
+  services.traefik.dynamicConfigOptions.http = {
+    routers.vaultwarden = {
+      rule        = "Host(`vaultwarden.dillon.io`)";
+      entryPoints = [ "websecure" ];
+      service     = "vaultwarden";
+      tls.certResolver = "letsencrypt";
+    };
+    services.vaultwarden.loadBalancer.servers = [{ url = "http://localhost:8000"; }];
+  };
+
   # Vaultwarden doesn't auto-detect postgres ordering; declare it explicitly.
   systemd.services.vaultwarden = {
     after    = [ "postgresql.service" ];

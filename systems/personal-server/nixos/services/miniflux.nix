@@ -10,4 +10,14 @@
       DATABASE_URL       = "user=miniflux host=/run/postgresql dbname=miniflux";
     };
   };
+
+  services.traefik.dynamicConfigOptions.http = {
+    routers.miniflux = {
+      rule        = "Host(`rss.dillon.io`)";
+      entryPoints = [ "websecure" ];
+      service     = "miniflux";
+      tls.certResolver = "letsencrypt";
+    };
+    services.miniflux.loadBalancer.servers = [{ url = "http://localhost:8080"; }];
+  };
 }

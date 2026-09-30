@@ -33,6 +33,16 @@
     };
   };
 
+  services.traefik.dynamicConfigOptions.http = {
+    routers.invidious = {
+      rule        = "Host(`invidious.dillon.io`)";
+      entryPoints = [ "websecure" ];
+      service     = "invidious";
+      tls.certResolver = "letsencrypt";
+    };
+    services.invidious.loadBalancer.servers = [{ url = "http://localhost:3001"; }];
+  };
+
   # DynamicUser=true (the module default) tries to bind-mount a private state
   # dir on top of /var/lib/invidious, which conflicts with the ZFS mountpoint.
   # Use an explicit user instead.
