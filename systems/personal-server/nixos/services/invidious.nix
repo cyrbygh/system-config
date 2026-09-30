@@ -50,6 +50,18 @@
     };
   };
 
+  # UID/GID 10001 = appuser inside the invidious-companion image.
+  systemd.tmpfiles.rules = [
+    "d /var/lib/invidious-companion 0700 10001 10001 -"
+  ];
+
+  systemd.services.podman-invidious-companion = {
+    serviceConfig = {
+      Restart    = lib.mkForce "always";
+      RestartSec = "10s";
+    };
+  };
+
   systemd.services.invidious-companion-update = {
     description = "Pull latest invidious-companion image and restart if changed";
     after    = [ "network-online.target" ];
