@@ -118,7 +118,8 @@ in {
           # WAN: DHCP response + ICMP + SSH (from masqueraded router IP)
           iifname wan udp dport 68                         accept
           iifname wan icmp type echo-request               accept
-          iifname wan tcp dport 22 ip saddr 10.215.50.0/24 accept  # Temporary SSH access to facilitate test server configuration from the real network.
+          iifname wan ip saddr 10.215.50.0/24 accept                    # Mgmt network access during test period.
+          iifname wan ip saddr 10.215.30.3   tcp dport { 8080, 8000 } accept  # Traefik.
           iifname wan reject with icmpx admin-prohibited
         }
 
