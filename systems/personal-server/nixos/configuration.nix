@@ -10,6 +10,7 @@
     ./services/vaultwarden.nix
     ./services/invidious.nix
     ./services/wireguard.nix
+    ./services/traefik.nix
   ];
 
   networking.hostName = "personal-server";
