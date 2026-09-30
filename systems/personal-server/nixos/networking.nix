@@ -108,7 +108,7 @@ in {
           ct state invalid                  drop
 
           # Trusted interfaces: full access to router services
-          iifname { infra, mgmt }           accept
+          iifname { infra, mgmt, wg0 }      accept
 
           # main and IoT: DNS and DHCP only
           iifname { main, iot } tcp dport 53               accept
@@ -117,6 +117,7 @@ in {
 
           # WAN: DHCP response + ICMP + SSH (from masqueraded router IP)
           iifname wan udp dport 68                         accept
+          iifname wan udp dport 443                        accept  # WireGuard
           iifname wan icmp type echo-request               accept
           iifname wan ip saddr 10.215.50.0/24 accept                    # Mgmt network access during test period.
           iifname wan ip saddr 10.215.30.3   tcp dport { 8000, 8080, 3001, 8282 } accept  # Traefik.
@@ -139,6 +140,9 @@ in {
 
           # Infra can reach IoT
           iifname infra oifname iot         accept
+
+          # VPN clients can reach internal networks; backup systems (10.77.68.0/24) are isolated.
+          iifname wg0 ip saddr 10.77.67.0/24 accept
 
           # NTP outbound from any VLAN
           oifname wan udp dport 123         accept
