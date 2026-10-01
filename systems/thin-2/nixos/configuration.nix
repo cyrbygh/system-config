@@ -24,6 +24,12 @@
      KEYBOARD_KEY_b0=f10
   '';
 
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+    "claude-code"
+  ];
+
+  environment.systemPackages = [ pkgs.claude-code ];
+
   age.secrets.wg0-conf.file = ../secrets/wg0-conf.age;
   age.secrets.ssh-key.file = ../secrets/ssh-key.age;
 
