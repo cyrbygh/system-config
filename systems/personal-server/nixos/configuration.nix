@@ -45,5 +45,11 @@
   ];
 
 
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.muser = import ./home.nix;
+  };
+
   system.stateVersion = "26.05";
 }
