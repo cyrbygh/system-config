@@ -36,6 +36,8 @@
 
   users.users.muser.openssh.authorizedKeys.keyFiles = [
     ../../server-desktop/ssh/id_ed25519.pub
+    ../../thin-1/ssh/id_ed25519.pub
+    ../../thin-2/ssh/id_ed25519.pub
   ];
 
   users.users.root.openssh.authorizedKeys.keyFiles = [
