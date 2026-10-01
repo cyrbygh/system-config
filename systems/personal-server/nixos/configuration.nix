@@ -24,9 +24,8 @@
   networking.hostName = "personal-server";
   networking.hostId = "49377d88";
 
-  # When transplanting to the i5-13400 machine, update this MAC to a8:a1:59:be:11:78
   systemd.network.links."10-tr0" = {
-    matchConfig.MACAddress = "18:c0:4d:90:4f:70";
+    matchConfig.MACAddress = "a8:a1:59:be:11:78";
     linkConfig.Name = "tr0";
   };
 
