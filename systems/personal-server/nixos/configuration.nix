@@ -16,6 +16,7 @@
     ./services/zigbee2mqtt.nix
     ./services/gonic.nix
     ./services/jellyfin.nix
+    ./services/home-assistant.nix
     ./sensitive.nix
   ];
 

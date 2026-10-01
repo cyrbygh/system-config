@@ -117,6 +117,9 @@ in {
           # IoT: MQTT
           iifname iot tcp dport 1883                        accept
 
+          # main: HomeKit bridge (web UI is infra-only, already covered above)
+          iifname main tcp dport 21063                      accept
+
           iifname { main, iot } reject with icmpx admin-prohibited
 
           # WAN: DHCP response + ICMP + SSH (from masqueraded router IP)

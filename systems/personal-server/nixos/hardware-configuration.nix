@@ -83,6 +83,11 @@ in
     fsType = "zfs";
   };
 
+  fileSystems."/var/lib/hass" = {
+    device = "ssds/var/lib/hass";
+    fsType = "zfs";
+  };
+
   fileSystems."/var/lib/zigbee2mqtt" = {
     device = "ssds/var/lib/zigbee2mqtt";
     fsType = "zfs";
