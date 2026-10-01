@@ -11,9 +11,8 @@
     enable     = true;
     serialPort = "/dev/ttyZW0";
     secretsConfigFile = config.age.secrets.zwave-keys.path;
-    # Port 3000 conflicts with AdGuard Home admin UI; HA must be configured to
-    # connect to ws://localhost:3001 in the Z-Wave JS integration settings.
-    port = 3001;
+    # 3000 = AdGuard, 3001 = Invidious; HA must connect to ws://localhost:3002
+    port = 3002;
   };
 
   systemd.services.zwave-js = {
