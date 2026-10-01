@@ -112,6 +112,9 @@ in {
           iifname { main, iot } tcp dport 53               accept
           iifname { main, iot } udp dport { 53, 67 }       accept
 
+          # main: WireGuard (allows local clients to connect via WAN IP)
+          iifname main udp dport 443                        accept
+
           # IoT: MQTT
           iifname iot tcp dport 1883                        accept
 
