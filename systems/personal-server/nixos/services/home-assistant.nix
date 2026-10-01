@@ -9,7 +9,12 @@
       "broadlink"
       "esphome"
       "homekit"
+      "lg_thinq"
+      "met"
       "mqtt"
+      "rest"
+      "thread"
+      "zha"
       "zwave_js"
     ];
   };
