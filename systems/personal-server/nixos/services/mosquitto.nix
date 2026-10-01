@@ -10,6 +10,7 @@
         port             = 1883;
         omitPasswordAuth = true;
         settings.allow_anonymous = true;
+        acl              = [ "topic readwrite #" ];
       }
       {
         # IoT VLAN: anonymous for now; add vacuum user with hashedPasswordFile once
@@ -18,6 +19,7 @@
         port             = 1883;
         omitPasswordAuth = true;
         settings.allow_anonymous = true;
+        acl              = [ "topic readwrite #" ];
       }
     ];
   };
