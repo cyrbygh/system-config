@@ -33,7 +33,8 @@
         pan_id      = 36795;
         ext_pan_id  = [ 184 49 121 226 58 142 21 223 ];
       };
-      devices = "devices.yaml";
+      devices  = "devices.yaml";
+      frontend.port = 8099;
     };
   };
 
