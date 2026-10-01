@@ -88,6 +88,11 @@ in
     fsType = "zfs";
   };
 
+  fileSystems."/var/lib/omada-controller" = {
+    device = "ssds/var/lib/omada-controller";
+    fsType = "zfs";
+  };
+
   fileSystems."/var/lib/zigbee2mqtt" = {
     device = "ssds/var/lib/zigbee2mqtt";
     fsType = "zfs";
