@@ -34,6 +34,13 @@
     settings.PasswordAuthentication = false;
   };
 
+  age.secrets.ssh-key = {
+    file = ../../secrets/ssh-key.age;
+    path = "/home/muser/.ssh/id_ed25519";
+    owner = "muser";
+    mode = "0600";
+  };
+
   users.users.muser.openssh.authorizedKeys.keyFiles = [
     ../../server-desktop/ssh/id_ed25519.pub
     ../../thin-1/ssh/id_ed25519.pub

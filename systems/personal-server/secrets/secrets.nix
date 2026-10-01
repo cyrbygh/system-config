@@ -3,8 +3,9 @@ let
   server-desktop  = "age18z0p6m7rhcsuxal7vjmrysvwrnsrk2kymjfc7c9ha6d5c7975e7skcuhzv";
 in
 {
-  "wg0-private-key.age".publicKeys    = [ personal-server server-desktop ];
-  "traefik-acme-email.age".publicKeys = [ personal-server server-desktop ];
+  "wg0-private-key.age".publicKeys           = [ personal-server server-desktop ];
+  "traefik-acme-email.age".publicKeys        = [ personal-server server-desktop ];
   "zwave-keys.age".publicKeys                = [ personal-server server-desktop ];
-  "zigbee2mqtt-network-key.age".publicKeys  = [ personal-server server-desktop ];
+  "zigbee2mqtt-network-key.age".publicKeys   = [ personal-server server-desktop ];
+  "ssh-key.age".publicKeys                   = [ personal-server ];
 }
