@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -13,7 +14,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, agenix, home-manager }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, agenix, home-manager }:
   let
     lib = nixpkgs.lib;
     systemNames = lib.pipe (builtins.readDir ../.. ) [
@@ -24,11 +25,17 @@
       ))
       builtins.attrNames
     ];
+    # Pull home-assistant from unstable so the package version stays close to
+    # HaOS releases and storage-format compatibility is maintained.
+    unstableOverlay = final: prev: {
+      home-assistant  = nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.home-assistant;
+      zwave-js-server = nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.zwave-js-server;
+    };
   in {
     nixosConfigurations = lib.genAttrs systemNames (name:
       nixpkgs.lib.nixosSystem {
         modules = [
-          { nixpkgs.overlays = [ agenix.overlays.default ]; }
+          { nixpkgs.overlays = [ agenix.overlays.default unstableOverlay ]; }
           agenix.nixosModules.default
           home-manager.nixosModules.home-manager
           ../../${name}/nixos/configuration.nix
