@@ -30,6 +30,7 @@
     unstableOverlay = final: prev: {
       home-assistant  = nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.home-assistant;
       zwave-js-server = nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.zwave-js-server;
+      invidious       = nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.invidious;
     };
   in {
     nixosConfigurations = lib.genAttrs systemNames (name:
