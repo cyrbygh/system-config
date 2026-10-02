@@ -118,8 +118,11 @@ in {
           # IoT: MQTT
           iifname iot tcp dport 1883                        accept
 
-          # main: HomeKit bridge + lock accessory
-          iifname main tcp dport { 21063, 21064 }           accept
+          # main: HomeKit bridge + lock + garage door accessories
+          iifname main tcp dport { 21063, 21064, 21065 }    accept
+
+          # main: mDNS (required for HomeKit accessory discovery)
+          iifname main udp dport 5353                        accept
 
           iifname { main, iot } reject with icmpx admin-prohibited
 
