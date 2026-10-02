@@ -61,5 +61,13 @@
     users.muser = import ./home.nix;
   };
 
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) [
+    "claude-code"
+  ];
+
+  environment.systemPackages = with pkgs; [
+    claude-code
+  ];
+
   system.stateVersion = "26.05";
 }
