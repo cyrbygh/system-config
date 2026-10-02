@@ -41,13 +41,13 @@
 
     "clock": {
       "interval": 10,
-      "format": " {:%Y/%m/%d %I:%M %p}", // Icon: calendar-alt
+      "format": " {:%Y/%m/%d %I:%M %p}", // Icon: calendar-alt
       "tooltip": false
     },
 
     "cpu": {
         "interval": 5,
-        "format": " {load}", // Icon: microchip
+        "format": " {load}", // Icon: microchip
         "states": {
           "warning": 70,
           "critical": 90
@@ -56,7 +56,7 @@
 
     "memory": {
         "interval": 5,
-        "format": " {used}/{total} GiB", // Icon: memory
+        "format": " {used}/{total} GiB", // Icon: memory
         "states": {
             "warning": 70,
             "critical": 90
@@ -65,14 +65,14 @@
 
     "network": {
         "interval": 5,
-        "format-wifi": " {essid} ({signalStrength}%)", // Icon: wifi
-        "format-ethernet": " {ifname}: {ipaddr}/{cidr}", // Icon: ethernet
+        "format-wifi": " {essid} ({signalStrength}%)", // Icon: wifi
+        "format-ethernet": " {ifname}: {ipaddr}/{cidr}", // Icon: ethernet
         "format-disconnected": "⚠  Disconnected",
         "tooltip": false
     },
 
     "sway/mode": {
-        "format": "<span style=\"italic\">  {}</span>", // Icon: expand-arrows-alt
+        "format": "<span style=\"italic\">  {}</span>", // Icon: expand-arrows-alt
         "tooltip": false
     },
 
@@ -84,16 +84,16 @@
     "pulseaudio": {
         "scroll-step": 1,
         "format": "{icon} {volume}%",
-        "format-bluetooth": "{icon}  {volume}%",
-        "format-muted": "",
+        "format-bluetooth": "{icon}  {volume}%",
+        "format-muted": "",
         "format-icons": {
-            "headphones": "",
-            "handsfree": "",
-            "headset": "",
-            "phone": "",
-            "portable": "",
-            "car": "",
-            "default": ["", ""]
+            "headphones": "",
+            "handsfree": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", ""]
         },
         "on-click": "pavucontrol"
     },
@@ -101,9 +101,8 @@
     "idle_inhibitor": {
         "format": "{icon}",
         "format-icons": {
-          "activated": "",
-          "deactivated": ""
+          "activated": "",
+          "deactivated": ""
         }
     }
 }
-

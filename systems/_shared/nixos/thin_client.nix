@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 
-let  # The cage session runs swayidle next to moonlight so the machine suspends after a stretch
+let
+  # The cage session runs swayidle next to moonlight so the machine suspends after a stretch
   # with no local input, for example once the stream drops and nobody is around. moonlight
   # inhibits idle while actively streaming and cage forwards that to the idle notifier, so this
   # only fires when the stream is idle. swayidle is killed when moonlight exits so cage loses
@@ -18,9 +19,21 @@ let  # The cage session runs swayidle next to moonlight so the machine suspends 
     ${pkgs.moonlight-qt}/bin/moonlight
     kill "$swayidle_pid"
   '';
+
+  # Registers the cage+moonlight session alongside sway.desktop in the tuigreet session picker.
+  moonlightSession = pkgs.writeTextDir "share/wayland-sessions/moonlight.desktop" ''
+    [Desktop Entry]
+    Name=Moonlight
+    Comment=Stream gaming session
+    Exec=${pkgs.cage}/bin/cage -d -s -- ${session}
+    Type=Application
+  '';
 in
 {
-  imports = [ ./base.nix ];
+  imports = [
+    ./base.nix
+    ./sway.nix
+  ];
 
   # Cage needs a render device, so pull in the graphics stack. Systems built on top of this
   # base can append hardware specific drivers via hardware.graphics.extraPackages.
@@ -32,10 +45,10 @@ in
     pulse.enable = true;
   };
 
-  # Keep the tuigreet login prompt, but drop the user straight into the cage session once they
-  # authenticate. Cage's -d drops client side decorations and -s allows VT switching.
+  # Session picker: moonlight (cage) or sway desktop. Both .desktop files land in
+  # /run/current-system/sw/share/wayland-sessions via environment.systemPackages.
   services.greetd.settings.default_session.command =
-    "${pkgs.tuigreet}/bin/tuigreet --time --kb-power 4 --cmd '${pkgs.cage}/bin/cage -d -s -- ${session}'";
+    "${pkgs.tuigreet}/bin/tuigreet --time --kb-power 4 --sessions /run/current-system/sw/share/wayland-sessions";
 
   # Cage relies on polkit to authorize VT switching.
   security.polkit.enable = true;
@@ -79,9 +92,30 @@ in
   # Skip the seatd backend (no daemon) so libseat goes straight to logind without flashing errors on screen.
   environment.variables.LIBSEAT_BACKEND = "logind";
 
-
   environment.systemPackages = lib.mkAfter (with pkgs; [
     cage
     moonlight-qt
+    moonlightSession
   ]);
+
+  home-manager.sharedModules = [
+    ../home/base.nix
+    ../home/nixos.nix
+    {
+      home.stateVersion = "26.05";
+
+      home.file = {
+        ".config/sway/config".source = ../sway;
+        ".config/waybar".source      = ../waybar;
+        ".config/mako/config".source = ../mako.conf;
+      };
+
+      # foot uses TERM=foot; remote hosts rarely have its terminfo, so force a
+      # universally supported value for SSH sessions.
+      programs.ssh = {
+        enable = true;
+        extraConfig = "SetEnv TERM=xterm-256color";
+      };
+    }
+  ];
 }
