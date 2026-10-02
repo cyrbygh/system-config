@@ -11,7 +11,6 @@ let
   main = mkSubnet 10 [
     { name = "inktank-printer";    n = 3;  mac = "e0:bb:9e:21:4b:cd"; }
     { name = "apple-tv";           n = 4;  mac = "c0:95:6d:55:5d:85"; }
-    { name = "scrypted";           n = 20; mac = "bc:24:11:e1:bd:02"; }
   ];
 
   infra = mkSubnet 20 [

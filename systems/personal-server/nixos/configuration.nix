@@ -9,6 +9,7 @@
     ./services/miniflux.nix
     ./services/vaultwarden.nix
     ./services/invidious.nix
+    ./services/scrypted.nix
     ./services/wireguard.nix
     ./services/traefik.nix
     ./services/mosquitto.nix
