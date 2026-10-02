@@ -49,6 +49,7 @@
 
   users.users.root.openssh.authorizedKeys.keyFiles = [
     ../../server-desktop/ssh/id_ed25519.pub
+    ../../thin-2/ssh/id_ed25519.pub
   ];
 
 
