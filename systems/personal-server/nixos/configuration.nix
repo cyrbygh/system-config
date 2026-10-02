@@ -35,7 +35,7 @@
   };
 
   age.secrets.ssh-key = {
-    file = ../../secrets/ssh-key.age;
+    file = ../secrets/ssh-key.age;
     path = "/home/muser/.ssh/id_ed25519";
     owner = "muser";
     mode = "0600";

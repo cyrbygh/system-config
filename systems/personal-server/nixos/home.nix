@@ -8,5 +8,5 @@
     ../../_shared/home/nixos.nix
   ];
 
-  home.file.".ssh/id_ed25519.pub".source = ../../ssh/id_ed25519.pub;
+  home.file.".ssh/id_ed25519.pub".source = ../ssh/id_ed25519.pub;
 }
