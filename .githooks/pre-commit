@@ -3,13 +3,14 @@
 # Get the directory of this script, then find encrypt.sh relative to repo root.
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-# Get current system name.
+# Get current system name. NixOS machines don't use the shell-based setup,
+# so skip encryption checks if systems/current isn't installed.
 CURRENT_SYSTEM_DIR="${REPO_ROOT}/systems/current"
-if [ -e "${CURRENT_SYSTEM_DIR}" ]; then
-    CURRENT_SYSTEM="$(basename "$(readlink "${CURRENT_SYSTEM_DIR}")")"
-else
-    CURRENT_SYSTEM=""
+if [ ! -e "${CURRENT_SYSTEM_DIR}" ]; then
+    echo "✅ No shell setup installed; skipping encryption check."
+    exit 0
 fi
+CURRENT_SYSTEM="$(basename "$(readlink "${CURRENT_SYSTEM_DIR}")")"
 
 # Check for decrypted files in non-current systems.
 found_foreign_decrypted=false
