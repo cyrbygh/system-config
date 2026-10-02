@@ -18,6 +18,7 @@
     ./services/gonic.nix
     ./services/jellyfin.nix
     ./services/home-assistant.nix
+    ./services/nut.nix
     ./services/omada-controller.nix
     ./sensitive.nix
   ];
