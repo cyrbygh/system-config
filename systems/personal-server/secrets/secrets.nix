@@ -8,4 +8,5 @@ in
   "zwave-keys.age".publicKeys                = [ personal-server server-desktop ];
   "zigbee2mqtt-network-key.age".publicKeys   = [ personal-server server-desktop ];
   "ssh-key.age".publicKeys                   = [ personal-server ];
+  "nut-monitor-password.age".publicKeys      = [ personal-server server-desktop ];
 }
