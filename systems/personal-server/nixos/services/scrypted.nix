@@ -8,15 +8,7 @@
     extraOptions = [ "--network=host" ];
   };
 
-  services.traefik.dynamicConfigOptions.http = {
-    routers.scrypted = {
-      rule        = "Host(`scrypted.dillon.io`)";
-      entryPoints = [ "websecure" ];
-      service     = "scrypted";
-      tls.certResolver = "letsencrypt";
-    };
-    services.scrypted.loadBalancer.servers = [{ url = "http://localhost:11080"; }];
-  };
+  # Access Scrypted at http://10.215.20.1:11080/ from infra VLAN or WireGuard.
 
   systemd.tmpfiles.rules = [
     "d /var/lib/scrypted 0750 root root -"
