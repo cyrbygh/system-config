@@ -13,14 +13,14 @@
     ports = [
       "127.0.0.1:8088:8088"   # HTTP management (Traefik backend)
       "127.0.0.1:8043:8043"   # HTTPS management (Traefik backend)
-      "29810:29810/udp"        # AP discovery
-      "29811:29811"            # AP management v1
-      "29812:29812"            # AP adoption
-      "29813:29813"            # AP upgrade
-      "29814:29814"            # AP management v2
-      "29815:29815"            # AP transfer v2
-      "29816:29816"            # RTTY
-      "27001:27001/udp"        # App discovery
+      "10.215.20.1:29810:29810/udp"  # AP discovery
+      "10.215.20.1:29811:29811"      # AP management v1
+      "10.215.20.1:29812:29812"      # AP adoption
+      "10.215.20.1:29813:29813"      # AP upgrade
+      "10.215.20.1:29814:29814"      # AP management v2
+      "10.215.20.1:29815:29815"      # AP transfer v2
+      "10.215.20.1:29816:29816"      # RTTY
+      "10.215.20.1:27001:27001/udp"  # App discovery
     ];
     volumes = [
       "/var/lib/omada-controller/data:/opt/tplink/EAPController/data"
