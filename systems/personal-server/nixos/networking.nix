@@ -38,7 +38,6 @@ let
 
   mgmt = mkSubnet 50 [
     { name = "thin-0";             n = 2;  mac = "f0:d4:e2:f9:17:66"; }
-    { name = "server-desktop";     n = 3;  mac = "bc:24:11:c6:33:dd"; }
   ];
 
   # Single source of truth for internal VLANs. Drives interface config,
