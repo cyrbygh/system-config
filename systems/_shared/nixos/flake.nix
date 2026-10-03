@@ -27,11 +27,19 @@
     ];
     # Pull home-assistant from unstable so the package version stays close to
     # HaOS releases and storage-format compatibility is maintained.
-    unstableOverlay = final: prev: {
-      home-assistant  = nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.home-assistant;
-      zwave-js-server = nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.zwave-js-server;
-      invidious       = nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.invidious;
-    };
+    unstableOverlay = final: prev:
+      let
+        unstable = import nixpkgs-unstable {
+          system = prev.stdenv.hostPlatform.system;
+          config.allowUnfree = true;
+        };
+      in {
+        home-assistant  = unstable.home-assistant;
+        zwave-js-server = unstable.zwave-js-server;
+        invidious       = unstable.invidious;
+        vaultwarden     = unstable.vaultwarden;
+        claude-code     = unstable.claude-code;
+      };
   in {
     nixosConfigurations = lib.genAttrs systemNames (name:
       nixpkgs.lib.nixosSystem {
