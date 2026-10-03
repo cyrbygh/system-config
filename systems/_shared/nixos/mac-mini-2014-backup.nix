@@ -153,7 +153,7 @@ in
   };
 
   users.users.muser.openssh.authorizedKeys.keyFiles = [
-    ../../server-desktop/ssh/id_ed25519.pub
+    ../../personal-server/ssh/id_ed25519.pub
   ];
 
   # Dedicated user for syncoid ZFS receive. Non-interactive SSH only (PermitTTY no);
