@@ -19,6 +19,7 @@ in
 
   boot.supportedFilesystems = [ "zfs" ];
   boot.zfs.requestEncryptionCredentials = false;
+  boot.zfs.forceImportRoot = false;
 
   # Mount the key disk in the initrd, load the ZFS encryption key,
   # then unmount before the pool datasets are mounted.
