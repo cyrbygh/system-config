@@ -52,7 +52,6 @@ in
   networking.networkmanager.enable = true;
   users.users.muser.extraGroups = [ "networkmanager" ];
 
-  age.identityPaths = [ "/etc/age_key" ];
   age.secrets.wg0-conf = {
     owner = "root";
     mode = "0400";

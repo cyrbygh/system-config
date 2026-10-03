@@ -8,7 +8,6 @@
 
   networking.hostName = "thin-0";
 
-  age.identityPaths = [ "/etc/age_key" ];
   age.secrets.ssh-key = {
     file = ../secrets/ssh-key.age;
     path = "/home/muser/.ssh/id_ed25519";
