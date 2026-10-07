@@ -223,6 +223,11 @@ in
     enable = true;
     # infra VLAN only - already fully trusted by the firewall, no nftables change needed.
     settings.bind_address = "10.215.20.1";
+    # CSRF protection (fix for CVE-2025-53095, a critical command-injection-via-UI bug)
+    # only allows localhost/127.0.0.1/::1 origins by default; whitelist the actual
+    # bind address so the web UI is usable without SSH port forwarding. Appended to
+    # those defaults, not a replacement for them.
+    settings.csrf_allowed_origins = "https://10.215.20.1:47990";
     # Mesa misreports HEVC Main10 (10-bit) as supported on this GPU (Navi22/6700XT) -
     # known upstream bug (Mesa gitlab #10092). Sunshine's encoder session segfaults on
     # teardown after failing to actually init that profile. Mode 2 keeps 8-bit HEVC
