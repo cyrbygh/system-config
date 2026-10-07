@@ -8,4 +8,5 @@ in
   "zigbee2mqtt-network-key.age".publicKeys   = [ personal-server ];
   "ssh-key.age".publicKeys                   = [ personal-server ];
   "nut-monitor-password.age".publicKeys      = [ personal-server ];
+  "frigate-rtsp-credentials.age".publicKeys  = [ personal-server ];
 }

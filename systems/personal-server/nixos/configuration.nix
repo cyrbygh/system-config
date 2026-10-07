@@ -89,6 +89,7 @@ in
     ./services/vaultwarden.nix
     ./services/invidious.nix
     ./services/scrypted.nix
+    ./services/frigate.nix
     ./services/wireguard.nix
     ./services/traefik.nix
     ./services/mosquitto.nix

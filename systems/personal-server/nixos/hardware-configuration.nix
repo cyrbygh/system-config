@@ -124,6 +124,11 @@ in
     options = [ "noauto" "zfsutil" ];
   };
 
+  fileSystems."/dvr/recordings" = {
+    device = "dvr/recordings";
+    fsType = "zfs";
+  };
+
   services.udev.extraRules = ''
     SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="ea24a9b0c58aef11967427ccef8776e9", GROUP="dialout", MODE="0660", SYMLINK+="ttyZB0", TAG+="systemd"
     SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="533D004242", GROUP="dialout", MODE="0660", SYMLINK+="ttyZW0", TAG+="systemd"
