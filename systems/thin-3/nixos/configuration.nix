@@ -72,7 +72,7 @@ in
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users.muser = import ./home.nix;
+    users.muser.home.file.".ssh/id_ed25519.pub".source = ../ssh/id_ed25519.pub;
   };
 
   system.stateVersion = "26.05";

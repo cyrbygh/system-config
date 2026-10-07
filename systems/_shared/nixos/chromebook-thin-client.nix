@@ -7,7 +7,6 @@
   networking.networkmanager.enable = true;
   users.users.muser.extraGroups = [ "networkmanager" ];
 
-  age.identityPaths = [ "/etc/age_key" ];
   age.secrets.wg0-conf.mode = "0400";
   age.secrets.ssh-key = {
     path = "/home/muser/.ssh/id_ed25519";
