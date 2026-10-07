@@ -1,34 +1,22 @@
 { config, lib, pkgs, ... }:
 
-let
-  # Resolved by PCI vendor ID at service start, not a fixed path - render-node
-  # enumeration order isn't guaranteed stable across reboots.
-  findIntelRenderNode = pkgs.writeShellScript "find-intel-render-node" ''
-    for node in /dev/dri/renderD*; do
-      name=$(basename "$node")
-      if [ "$(cat "/sys/class/drm/$name/device/vendor" 2>/dev/null)" = "0x8086" ]; then
-        echo "$node"
-        exit 0
-      fi
-    done
-    exit 1
-  '';
-
-  # frigate.yaml has no shell templating, so the placeholder is substituted into
-  # the runtime config after the module's own config-writing step, not build time.
-  patchFrigateRenderNode = pkgs.writeShellScript "patch-frigate-render-node" ''
-    node=$(${pkgs.coreutils}/bin/timeout 10 ${findIntelRenderNode})
-    ${pkgs.gnused}/bin/sed -i "s|__INTEL_RENDER_NODE__|$node|g" /run/frigate/frigate.yml
-  '';
-in
 {
   # Intel iGPU is otherwise idle (sway/sunshine use the AMD 6700XT) - used here for
   # both ffmpeg decode (VAAPI) and detection (OpenVINO targeting the same GPU device).
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
 
-  systemd.services.frigate.serviceConfig.ExecStartPre = lib.mkAfter [
-    "${patchFrigateRenderNode}"
-  ];
+  # Render-node minor numbers (renderD128/129/130) aren't stable across reboots -
+  # confirmed to shift on this box - so Frigate's own unordered-listing-based GPU
+  # autodetection can't be trusted with all three GPUs visible. The iGPU's PCI
+  # address is fixed by the chassis wiring, unlike probe order, so bind-mounting
+  # it by that path into a private /dev gives frigate a /dev/dri with only one
+  # render node, every boot - same effect as the single-device passthrough Docker
+  # users rely on, without needing to track which minor number is Intel this time.
+  systemd.services.frigate.serviceConfig = {
+    PrivateDevices = true;
+    DeviceAllow = [ "char-drm rw" ];
+    BindPaths = [ "/dev/dri/by-path/pci-0000:00:02.0-render:/dev/dri/renderD128" ];
+  };
 
   # FRIGATE_RTSP_PASSWORD below, read by systemd (as root) before it drops
   # privileges to the frigate user - shared password across all four cameras.
@@ -78,9 +66,9 @@ in
         labelmap_path = "/var/lib/frigate/model/coco_91cl_bkgr.txt";
       };
 
-      # Not the "preset-vaapi" shorthand - its auto-detection isn't vendor-aware and
-      # picked the wrong GPU. __INTEL_RENDER_NODE__ is substituted at service start.
-      ffmpeg.hwaccel_args = "-hwaccel_flags allow_profile_mismatch -hwaccel vaapi -hwaccel_device __INTEL_RENDER_NODE__ -hwaccel_output_format vaapi";
+      # Default GPU index (0) is correct here - the private /dev set up above only
+      # ever exposes one render node, so there's nothing for Frigate to pick between.
+      ffmpeg.hwaccel_args = "preset-vaapi";
 
       record = {
         enabled = true;
