@@ -223,6 +223,11 @@ in
     enable = true;
     # infra VLAN only - already fully trusted by the firewall, no nftables change needed.
     settings.bind_address = "10.215.20.1";
+    # Mesa misreports HEVC Main10 (10-bit) as supported on this GPU (Navi22/6700XT) -
+    # known upstream bug (Mesa gitlab #10092). Sunshine's encoder session segfaults on
+    # teardown after failing to actually init that profile. Mode 2 keeps 8-bit HEVC
+    # (still more efficient than falling back to H.264) without touching Main10.
+    settings.hevc_mode = 2;
     # Runs on every stream start/stop: resize the output, then stop/start the console login.
     settings.global_prep_cmd = builtins.toJSON [
       {
