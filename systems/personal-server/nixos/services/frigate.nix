@@ -1,9 +1,34 @@
 { config, lib, pkgs, ... }:
 
+let
+  # Resolved by PCI vendor ID at service start, not a fixed path - render-node
+  # enumeration order isn't guaranteed stable across reboots.
+  findIntelRenderNode = pkgs.writeShellScript "find-intel-render-node" ''
+    for node in /dev/dri/renderD*; do
+      name=$(basename "$node")
+      if [ "$(cat "/sys/class/drm/$name/device/vendor" 2>/dev/null)" = "0x8086" ]; then
+        echo "$node"
+        exit 0
+      fi
+    done
+    exit 1
+  '';
+
+  # frigate.yaml has no shell templating, so the placeholder is substituted into
+  # the runtime config after the module's own config-writing step, not build time.
+  patchFrigateRenderNode = pkgs.writeShellScript "patch-frigate-render-node" ''
+    node=$(${pkgs.coreutils}/bin/timeout 10 ${findIntelRenderNode})
+    ${pkgs.gnused}/bin/sed -i "s|__INTEL_RENDER_NODE__|$node|g" /run/frigate/frigate.yml
+  '';
+in
 {
   # Intel iGPU is otherwise idle (sway/sunshine use the AMD 6700XT) - used here for
   # both ffmpeg decode (VAAPI) and detection (OpenVINO targeting the same GPU device).
   hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
+
+  systemd.services.frigate.serviceConfig.ExecStartPre = lib.mkAfter [
+    "${patchFrigateRenderNode}"
+  ];
 
   # FRIGATE_RTSP_PASSWORD below, read by systemd (as root) before it drops
   # privileges to the frigate user - shared password across all four cameras.
@@ -53,7 +78,9 @@
         labelmap_path = "/var/lib/frigate/model/coco_91cl_bkgr.txt";
       };
 
-      ffmpeg.hwaccel_args = "preset-vaapi";
+      # Not the "preset-vaapi" shorthand - its auto-detection isn't vendor-aware and
+      # picked the wrong GPU. __INTEL_RENDER_NODE__ is substituted at service start.
+      ffmpeg.hwaccel_args = "-hwaccel_flags allow_profile_mismatch -hwaccel vaapi -hwaccel_device __INTEL_RENDER_NODE__ -hwaccel_output_format vaapi";
 
       record = {
         enabled = true;
