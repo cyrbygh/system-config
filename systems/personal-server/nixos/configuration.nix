@@ -4,18 +4,10 @@ let
   # Background color swaylock shows while locked.
   lockColor = "34495e";
 
-  # Resolved by PCI vendor ID, not a hardcoded renderD path - this box has multiple
-  # GPUs and render-node enumeration order isn't guaranteed across reboots.
-  findAmdRenderNode = pkgs.writeShellScript "find-amd-render-node" ''
-    for node in /dev/dri/renderD*; do
-      name=$(basename "$node")
-      if [ "$(cat "/sys/class/drm/$name/device/vendor" 2>/dev/null)" = "0x1002" ]; then
-        echo "$node"
-        exit 0
-      fi
-    done
-    exit 1
-  '';
+  # by-path, not a hardcoded renderD path - render-node minor numbers aren't stable
+  # across reboots (confirmed to shift on this box), but the AMD GPU's PCI address
+  # is fixed by the chassis wiring.
+  amdRenderNode = "/dev/dri/by-path/pci-0000:03:00.0-render";
 
   # The infra VLAN is a static-IP interface excluded from network-online.target
   # (networking.nix only waits on wan), so nothing otherwise stops sunshine from
@@ -179,10 +171,11 @@ in
     wantedBy = [ "default.target" ];
     unitConfig.ConditionUser = "muser";
     serviceConfig = {
-      # amdgpu can finish probing after this user service would otherwise start. Without
-      # the render node, sway silently falls back to the pixman software renderer, which
-      # only exports SHM and breaks sunshine's dmabuf capture. Wait for the node first.
-      ExecStartPre = "${pkgs.coreutils}/bin/timeout 30 ${pkgs.bash}/bin/sh -c 'until ${findAmdRenderNode} >/dev/null 2>&1; do sleep 0.2; done'";
+      # amdgpu can finish probing (and udev can finish creating the by-path symlink)
+      # after this user service would otherwise start. Without the render node, sway
+      # silently falls back to the pixman software renderer, which only exports SHM
+      # and breaks sunshine's dmabuf capture. Wait for the node first.
+      ExecStartPre = "${pkgs.coreutils}/bin/timeout 30 ${pkgs.bash}/bin/sh -c 'until [ -e ${amdRenderNode} ]; do sleep 0.2; done'";
       ExecStart = "${config.programs.sway.package}/bin/sway";
       Restart = "on-failure";
     };
@@ -213,7 +206,7 @@ in
     wrapperFeatures.gtk = true;
     extraSessionCommands = ''
       export WLR_BACKENDS=headless,libinput
-      export WLR_RENDER_DRM_DEVICE="$(${findAmdRenderNode})"
+      export WLR_RENDER_DRM_DEVICE="${amdRenderNode}"
       export LIBSEAT_BACKEND=noop
       export WLR_LIBINPUT_NO_DEVICES=1
       export PATH=/run/current-system/sw/bin:/run/wrappers/bin:$PATH
