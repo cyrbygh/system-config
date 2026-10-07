@@ -62,39 +62,58 @@
 
       cameras = {
         cam-1 = {
-          # Hikvision
+          # Hikvision. Detect runs against the substream (channel 102) - the main
+          # stream's 2560x1440 intermittently crashed VAAPI hwdownload ("Failed to
+          # sync surface"), and detection doesn't need full resolution anyway.
           ffmpeg.inputs = [
             {
+              path = "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@10.215.40.10:554/Streaming/Channels/102";
+              roles = [ "detect" ];
+            }
+            {
               path = "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@10.215.40.10:554/Streaming/Channels/101";
-              roles = [ "detect" "record" ];
+              roles = [ "record" ];
             }
           ];
         };
         cam-2 = {
-          # Amcrest (Dahua-licensed firmware, hence the Dahua-style path)
+          # Amcrest (Dahua-licensed firmware, hence the Dahua-style path). Detect
+          # runs against the substream (subtype=1) - same reasoning as cam-1.
           ffmpeg.inputs = [
             {
+              path = "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@10.215.40.11:554/cam/realmonitor?channel=1&subtype=1";
+              roles = [ "detect" ];
+            }
+            {
               path = "rtsp://admin:{FRIGATE_RTSP_PASSWORD}@10.215.40.11:554/cam/realmonitor?channel=1&subtype=0";
-              roles = [ "detect" "record" ];
+              roles = [ "record" ];
             }
           ];
         };
         cam-3 = {
           # TP-Link Tapo - Camera Account username is "cadmin" here, not "admin"
-          # like cam-1/cam-2; password is shared.
+          # like cam-1/cam-2; password is shared. Detect runs against stream2 (sub).
           ffmpeg.inputs = [
             {
+              path = "rtsp://cadmin:{FRIGATE_RTSP_PASSWORD}@10.215.40.12:554/stream2";
+              roles = [ "detect" ];
+            }
+            {
               path = "rtsp://cadmin:{FRIGATE_RTSP_PASSWORD}@10.215.40.12:554/stream1";
-              roles = [ "detect" "record" ];
+              roles = [ "record" ];
             }
           ];
         };
         cam-4 = {
-          # TP-Link Tapo - same username/password split as cam-3.
+          # TP-Link Tapo - same username/password split and sub/main split as cam-3.
           ffmpeg.inputs = [
             {
+              path = "rtsp://cadmin:{FRIGATE_RTSP_PASSWORD}@10.215.40.13:554/stream2";
+              roles = [ "detect" ];
+            }
+            {
               path = "rtsp://cadmin:{FRIGATE_RTSP_PASSWORD}@10.215.40.13:554/stream1";
-              roles = [ "detect" "record" ];
+              roles = [ "record" ];
             }
           ];
         };
