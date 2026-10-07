@@ -17,6 +17,16 @@ let
     exit 1
   '';
 
+  # The infra VLAN is a static-IP interface excluded from network-online.target
+  # (networking.nix only waits on wan), so nothing otherwise stops sunshine from
+  # starting before its bind address exists, which fails as a one-shot bind()
+  # with no retry.
+  waitForBindAddress = pkgs.writeShellScript "wait-for-sunshine-bind-address" ''
+    until ${pkgs.iproute2}/bin/ip -4 addr show | grep -q "inet ${config.services.sunshine.settings.bind_address}/"; do
+      sleep 0.2
+    done
+  '';
+
   # Resize the headless output to the connecting Moonlight client, matching refresh
   # rate when sunshine provides one. Scale 2 at 1440p or higher, otherwise 1.
   resizeToClient = pkgs.writeShellScript "sunshine-resize-to-client" ''
@@ -229,7 +239,10 @@ in
   # lingering user sessions (see mkSessionService above for why).
   systemd.user.services.sunshine = {
     unitConfig.ConditionUser = "muser";
-    serviceConfig.ExecStopPost = "${startConsoleLogin}";
+    serviceConfig = {
+      ExecStartPre = "${pkgs.coreutils}/bin/timeout 30 ${waitForBindAddress}";
+      ExecStopPost = "${startConsoleLogin}";
+    };
   };
 
   security.sudo.extraRules = [
