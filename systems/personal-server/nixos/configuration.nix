@@ -51,11 +51,16 @@ let
   '';
 
   # Wiring shared by every service that belongs to the sway graphical session.
+  # systemd.user.services installs a system-wide template available to *any*
+  # user's systemd --user manager, not just muser's - ConditionUser prevents it
+  # from also spinning up under root/greeter if they ever have a lingering user
+  # session reach default.target/graphical-session.target.
   mkSessionService = description: execStart: {
     inherit description;
     partOf = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
     wantedBy = [ "graphical-session.target" ];
+    unitConfig.ConditionUser = "muser";
     serviceConfig = {
       ExecStart = execStart;
       Restart = "on-failure";
@@ -159,6 +164,7 @@ in
 
   systemd.user.services.sway = {
     wantedBy = [ "default.target" ];
+    unitConfig.ConditionUser = "muser";
     serviceConfig = {
       # amdgpu can finish probing after this user service would otherwise start. Without
       # the render node, sway silently falls back to the pixman software renderer, which
@@ -219,7 +225,12 @@ in
   };
 
   # Crash-safety backstop: restarts greetd if sunshine dies mid-stream before undo runs.
-  systemd.user.services.sunshine.serviceConfig.ExecStopPost = "${startConsoleLogin}";
+  # ConditionUser guards against this template also starting under root/greeter's own
+  # lingering user sessions (see mkSessionService above for why).
+  systemd.user.services.sunshine = {
+    unitConfig.ConditionUser = "muser";
+    serviceConfig.ExecStopPost = "${startConsoleLogin}";
+  };
 
   security.sudo.extraRules = [
     {
