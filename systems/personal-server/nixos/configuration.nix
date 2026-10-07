@@ -52,12 +52,14 @@ let
   # greetd (tty1/PiKVM console) gets stopped for the duration of a stream, since
   # sunshine's uinput input reaches the active VT regardless of seat boundaries.
   # Needs sudo (see security.sudo.extraRules below): greetd.service is a system
-  # unit, sunshine.service is a user unit running as plain muser.
+  # unit, sunshine.service is a user unit running as plain muser. Must go through
+  # /run/wrappers/bin/sudo specifically - the plain ${pkgs.sudo} store path isn't
+  # setuid and refuses to run at all for a non-root caller.
   startConsoleLogin = pkgs.writeShellScript "sunshine-start-console-login" ''
-    ${pkgs.sudo}/bin/sudo ${pkgs.systemd}/bin/systemctl start greetd.service
+    /run/wrappers/bin/sudo ${pkgs.systemd}/bin/systemctl start greetd.service
   '';
   stopConsoleLogin = pkgs.writeShellScript "sunshine-stop-console-login" ''
-    ${pkgs.sudo}/bin/sudo ${pkgs.systemd}/bin/systemctl stop greetd.service
+    /run/wrappers/bin/sudo ${pkgs.systemd}/bin/systemctl stop greetd.service
   '';
 
   # Wiring shared by every service that belongs to the sway graphical session.
