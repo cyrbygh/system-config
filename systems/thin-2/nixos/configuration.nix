@@ -36,7 +36,10 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users.muser.home.file.".ssh/id_ed25519.pub".source = ../ssh/id_ed25519.pub;
+    users.muser.home.file = {
+      ".ssh/id_ed25519.pub".source = ../ssh/id_ed25519.pub;
+      ".config/foot/foot.ini".source = ../foot.ini;
+    };
   };
 
   system.stateVersion = "26.05";
