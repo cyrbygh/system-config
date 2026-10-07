@@ -19,6 +19,14 @@
     after     = [ "hdds-sensitive-media-music.mount" ];
   };
 
+  # StateDirectory=gonic only creates /var/lib/gonic itself; the module's own
+  # BindPaths for playlists-path/podcast-path need these to already exist, or
+  # the service fails at mount-namespace setup before gonic ever runs.
+  systemd.tmpfiles.rules = [
+    "d /var/lib/gonic/playlists 0755 root root -"
+    "d /var/lib/gonic/podcasts 0755 root root -"
+  ];
+
   services.traefik.dynamicConfigOptions.http = {
     routers.gonic = {
       rule        = "Host(`music.dillon.io`)";
