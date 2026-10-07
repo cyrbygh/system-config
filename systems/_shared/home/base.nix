@@ -89,6 +89,16 @@
     '';
   };
 
+  # Terminal emulators often set a non-standard TERM (xterm-kitty, foot, ...) that
+  # remote hosts rarely have terminfo for, so force a universally supported value
+  # for SSH sessions. This configures the SSH *client* (~/.ssh/config) only - it
+  # has nothing to do with running an SSH server.
+  programs.ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+    settings."*".SetEnv = { TERM = "xterm-256color"; };
+  };
+
   programs.tmux = {
     enable = true;
     extraConfig = ''
