@@ -279,11 +279,6 @@ in
         ".config/mako/config".source      = ../../_shared/mako.conf;
       };
 
-      programs.ssh = {
-        enable = true;
-        extraConfig = "SetEnv TERM=xterm-256color";
-      };
-
       programs.zsh = {
         shellAliases = {
           icat = "kitty +kitten icat --align left";

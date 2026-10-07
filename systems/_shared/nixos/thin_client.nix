@@ -109,14 +109,6 @@ in
         ".config/waybar".source      = ../waybar;
         ".config/mako/config".source = ../mako.conf;
       };
-
-      # foot uses TERM=foot; remote hosts rarely have its terminfo, so force a
-      # universally supported value for SSH sessions.
-      programs.ssh = {
-        enable = true;
-        enableDefaultConfig = false;
-        settings."*".SetEnv = { TERM = "xterm-256color"; };
-      };
     }
   ];
 }
