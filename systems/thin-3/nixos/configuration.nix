@@ -52,7 +52,7 @@ in
     out=$(${pkgs.wlr-randr}/bin/wlr-randr --json \
       | ${pkgs.jq}/bin/jq -r '.[] | select(.model == "HP X24ih" and .serial == "1CR1261HJ7") | .name')
     if [ -n "$out" ]; then
-      ${pkgs.wlr-randr}/bin/wlr-randr --output "$out" --mode 1920x1080@120Hz
+      ${pkgs.coreutils}/bin/timeout 5 ${pkgs.wlr-randr}/bin/wlr-randr --output "$out" --mode 1920x1080@120Hz
     fi
 
     # Prefer DP/HDMI audio when a monitor is plugged in, else the built-in speakers.

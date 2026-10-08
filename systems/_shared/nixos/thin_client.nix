@@ -16,7 +16,9 @@ let
     until ${pkgs.pipewire}/bin/pw-cli info >/dev/null 2>&1; do
       sleep 0.2
     done
+    set -x
     ${config.thinClient.sessionInit}
+    set +x
     ${pkgs.moonlight-qt}/bin/moonlight
     kill "$swayidle_pid"
   '';
@@ -26,7 +28,7 @@ let
     [Desktop Entry]
     Name=Moonlight
     Comment=Stream gaming session
-    Exec=${pkgs.cage}/bin/cage -d -s -- ${session}
+    Exec=${pkgs.systemd}/bin/systemd-cat -t cage ${pkgs.cage}/bin/cage -d -s -m last -- ${session}
     Type=Application
   '';
 in
