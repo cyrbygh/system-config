@@ -120,6 +120,9 @@ in {
           # main: HomeKit bridge + lock + garage door accessories
           iifname main tcp dport { 21063, 21064, 21065 }    accept
 
+          # main: Scrypted HomeKit cameras
+          iifname main tcp dport { 33147, 34151, 44868, 45069 }  accept
+
           # main: mDNS (required for HomeKit accessory discovery)
           iifname main udp dport 5353                        accept
 
