@@ -230,6 +230,9 @@ in {
     };
   };
 
+  # dnsmasq only reads addn-hosts at startup.
+  systemd.services.dnsmasq.restartTriggers = [ localHostsFile ];
+
   # ── DNS: AdGuard Home ──────────────────────────────────────────────────────
   services.adguardhome = {
     enable = true;
