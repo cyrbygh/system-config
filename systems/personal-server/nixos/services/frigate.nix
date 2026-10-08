@@ -13,6 +13,14 @@
   systemd.services.frigate.serviceConfig.EnvironmentFile =
     config.age.secrets.frigate-rtsp-credentials.path;
 
+  # Frigate only unlinks its /dev/shm frame buffers on a clean exit, and reattaches
+  # to an existing buffer without checking its size. Leftovers from a killed run
+  # sized for an old detect resolution make every frame read fail. (Docker gets a
+  # fresh /dev/shm per container, so upstream never hits this.)
+  systemd.services.frigate.serviceConfig.ExecStartPre = lib.mkBefore [
+    "${pkgs.findutils}/bin/find /dev/shm -maxdepth 1 -user frigate -delete"
+  ];
+
   services.frigate = {
     enable = true;
     hostname = "frigate.infra";
