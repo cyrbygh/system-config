@@ -32,6 +32,7 @@ in
   imports = [
     ./hardware-configuration.nix
     ../../_shared/nixos/chromebook-thin-client.nix
+    ../../_shared/nixos/iwlwifi-resume-fix.nix
   ];
 
   networking.hostName = "thin-3";
