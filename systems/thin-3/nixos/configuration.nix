@@ -43,6 +43,30 @@ in
   # and override the udev classification so libinput generates pointer events instead.
   services.udev.extraRules = ''
     SUBSYSTEM=="input", ATTRS{name}=="Google Inc. Hammer", ATTRS{capabilities/abs}=="673800001000003", ENV{ID_INPUT_TOUCHPAD}="1", ENV{ID_INPUT_TOUCHSCREEN}=""
+    # No UCM profile for DP/HDMI audio, so nothing else unmutes it.
+    SUBSYSTEM=="sound", KERNEL=="controlC*", ATTRS{id}=="HDMI", RUN+="${pkgs.alsa-utils}/bin/amixer -c HDMI -q sset IEC958,0 on"
+  '';
+
+  thinClient.sessionInit = ''
+    # HP X24ih: 1080p at 120Hz.
+    out=$(${pkgs.wlr-randr}/bin/wlr-randr --json \
+      | ${pkgs.jq}/bin/jq -r '.[] | select(.model == "HP X24ih" and .serial == "1CR1261HJ7") | .name')
+    if [ -n "$out" ]; then
+      ${pkgs.wlr-randr}/bin/wlr-randr --output "$out" --mode 1920x1080@120Hz
+    fi
+
+    # Prefer DP/HDMI audio when a monitor is plugged in, else the built-in speakers.
+    if ${pkgs.alsa-utils}/bin/amixer -c HDMI cget iface=CARD,name='HDMI/DP Jack' | grep -q ': values=on'; then
+      sink=alsa_output.platform-avs_hdaudio.22.auto.stereo-fallback
+    else
+      sink=alsa_output.platform-avs_max98927.20.auto.HiFi__Speaker__sink
+    fi
+    for _ in $(seq 25); do
+      id=$(${pkgs.pipewire}/bin/pw-dump \
+        | ${pkgs.jq}/bin/jq -r --arg n "$sink" '.[] | select(.info.props."node.name" == $n) | .id')
+      [ -n "$id" ] && { ${pkgs.wireplumber}/bin/wpctl set-default "$id"; break; }
+      sleep 0.2
+    done
   '';
 
   systemd.user.services.pipewire.environment.ALSA_CONFIG_UCM2 = "${ucm2}";

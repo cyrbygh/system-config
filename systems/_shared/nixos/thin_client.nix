@@ -16,6 +16,7 @@ let
     until ${pkgs.pipewire}/bin/pw-cli info >/dev/null 2>&1; do
       sleep 0.2
     done
+    ${config.thinClient.sessionInit}
     ${pkgs.moonlight-qt}/bin/moonlight
     kill "$swayidle_pid"
   '';
@@ -33,6 +34,13 @@ in
   imports = [
     ./base.nix
     ./sway.nix
+    {
+      # Per-host commands run inside cage before moonlight starts.
+      options.thinClient.sessionInit = lib.mkOption {
+        type = lib.types.lines;
+        default = "";
+      };
+    }
   ];
 
   # Cage needs a render device, so pull in the graphics stack. Systems built on top of this
