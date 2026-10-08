@@ -128,6 +128,13 @@ in
 
   hardware.graphics.enable = true;
 
+  # Intel iGPU drivers, used by Frigate: media-driver for VAAPI decode,
+  # compute-runtime for OpenVINO's GPU plugin (without it OpenVINO only sees CPU).
+  hardware.graphics.extraPackages = with pkgs; [
+    intel-media-driver
+    intel-compute-runtime
+  ];
+
   # amdgpu is in-kernel but loads its microcode from linux-firmware at probe time.
   hardware.enableRedistributableFirmware = true;
 
