@@ -149,4 +149,9 @@ in
   services.nginx.virtualHosts."frigate.infra".listen = lib.mkForce [
     { addr = "10.215.20.1"; port = 8971; }
   ];
+
+  systemd.services.nginx = {
+    wants = [ "systemd-networkd-wait-online@infra.service" ];
+    after = [ "systemd-networkd-wait-online@infra.service" ];
+  };
 }

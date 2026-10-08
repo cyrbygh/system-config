@@ -92,6 +92,8 @@ in
     ./services/home-assistant.nix
     ./services/nut.nix
     ./services/omada-controller.nix
+    ./services/ollama.nix
+    ./services/open-webui.nix
     ./sensitive.nix
   ];
 
@@ -137,6 +139,16 @@ in
 
   # amdgpu is in-kernel but loads its microcode from linux-firmware at probe time.
   hardware.enableRedistributableFirmware = true;
+
+  # Nvidia RTX 3060, compute only (Ollama). No X server; this option is just what
+  # loads the driver.
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.nvidia = {
+    open = true;
+    # No KMS/fbdev, so the console stays on the AMD card (PiKVM).
+    modesetting.enable = false;
+    nvidiaSettings = false;
+  };
 
   services.pipewire = {
     enable = true;
@@ -234,6 +246,9 @@ in
     # teardown after failing to actually init that profile. Mode 2 keeps 8-bit HEVC
     # (still more efficient than falling back to H.264) without touching Main10.
     settings.hevc_mode = 2;
+    # Keep encoding on the AMD card; Sunshine would otherwise prefer NVENC.
+    settings.encoder = "vaapi";
+    settings.adapter_name = amdRenderNode;
     # Runs on every stream start/stop: resize the output, then stop/start the console login.
     settings.global_prep_cmd = builtins.toJSON [
       {
@@ -279,7 +294,19 @@ in
 
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
     "claude-code"
+    "cuda_cccl"
+    "cuda_cudart"
+    "cuda_nvcc"
+    "libcublas"
+    "nvidia-x11"
+    "open-webui"
   ];
+
+  # Prebuilt CUDA packages (cache.nixos.org doesn't carry unfree).
+  nix.settings = {
+    extra-substituters = [ "https://cache.nixos-cuda.org" ];
+    extra-trusted-public-keys = [ "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M=" ];
+  };
 
   environment.systemPackages = lib.mkAfter (with pkgs; [
     claude-code
