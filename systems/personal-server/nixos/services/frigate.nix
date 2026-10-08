@@ -7,15 +7,16 @@
 
   # Render-node minor numbers (renderD128/129/130) aren't stable across reboots -
   # confirmed to shift on this box - so Frigate's own unordered-listing-based GPU
-  # autodetection can't be trusted with all three GPUs visible. The iGPU's PCI
-  # address is fixed by the chassis wiring, unlike probe order, so bind-mounting
-  # it by that path into a private /dev gives frigate a /dev/dri with only one
-  # render node, every boot - same effect as the single-device passthrough Docker
-  # users rely on, without needing to track which minor number is Intel this time.
+  # autodetection can't be trusted with all three GPUs visible. /dev/dri/intel-render
+  # (udev rule in hardware-configuration.nix, PCI-address-keyed like by-path but
+  # without colons - BindPaths can't parse those) gives frigate a private /dev
+  # with only that one render node, every boot - same effect as the single-device
+  # passthrough Docker users rely on, without needing to track which minor number
+  # is Intel this time.
   systemd.services.frigate.serviceConfig = {
     PrivateDevices = true;
     DeviceAllow = [ "char-drm rw" ];
-    BindPaths = [ "/dev/dri/by-path/pci-0000:00:02.0-render:/dev/dri/renderD128" ];
+    BindPaths = [ "/dev/dri/intel-render:/dev/dri/renderD128" ];
   };
 
   # FRIGATE_RTSP_PASSWORD below, read by systemd (as root) before it drops
