@@ -135,8 +135,11 @@ in
 
     # Same PCI-address stability as /dev/dri/by-path, just without the colons -
     # systemd's BindPaths= can't parse a source path containing them (it uses ':'
-    # as its own source:destination separator).
-    SUBSYSTEM=="drm", KERNEL=="renderD*", ATTRS{vendor}=="0x8086", SYMLINK+="dri/intel-render"
+    # as its own source:destination separator). KERNELS, not ATTRS{vendor} - this
+    # is an Intel-chipset board, so every PCI device's ancestry eventually reaches
+    # an Intel-vendored root complex; ATTRS{vendor}=="0x8086" matched all three
+    # GPUs this way, not just the Intel one, confirmed via udevadm test.
+    SUBSYSTEM=="drm", KERNEL=="renderD*", KERNELS=="0000:00:02.0", SYMLINK+="dri/intel-render"
   '';
 
   swapDevices = [];
