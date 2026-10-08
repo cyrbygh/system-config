@@ -1,24 +1,6 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Intel iGPU is otherwise idle (sway/sunshine use the AMD 6700XT) - used here for
-  # both ffmpeg decode (VAAPI) and detection (OpenVINO targeting the same GPU device).
-  hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
-
-  # Render-node minor numbers (renderD128/129/130) aren't stable across reboots -
-  # confirmed to shift on this box - so Frigate's own unordered-listing-based GPU
-  # autodetection can't be trusted with all three GPUs visible. /dev/dri/intel-render
-  # (udev rule in hardware-configuration.nix, PCI-address-keyed like by-path but
-  # without colons - BindPaths can't parse those) gives frigate a private /dev
-  # with only that one render node, every boot - same effect as the single-device
-  # passthrough Docker users rely on, without needing to track which minor number
-  # is Intel this time.
-  systemd.services.frigate.serviceConfig = {
-    PrivateDevices = true;
-    DeviceAllow = [ "char-drm rw" ];
-    BindPaths = [ "/dev/dri/intel-render:/dev/dri/renderD128" ];
-  };
-
   # FRIGATE_RTSP_PASSWORD below, read by systemd (as root) before it drops
   # privileges to the frigate user - shared password across all four cameras.
   # Usernames aren't secret, so they're hardcoded per-camera instead.
@@ -67,8 +49,8 @@
         labelmap_path = "/var/lib/frigate/model/coco_91cl_bkgr.txt";
       };
 
-      # Default GPU index (0) is correct here - the private /dev set up above only
-      # ever exposes one render node, so there's nothing for Frigate to pick between.
+      # No GPU index needed: Frigate picks among render nodes that pass vainfo, and
+      # with LIBVA_DRIVER_NAME=iHD (vaapiDriver above) only the Intel node does.
       ffmpeg.hwaccel_args = "preset-vaapi";
 
       record = {
