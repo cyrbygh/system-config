@@ -104,6 +104,16 @@ in
     fsType = "zfs";
   };
 
+  fileSystems."/var/lib/ollama" = {
+    device = "ssds/var/lib/ollama";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/ollama/models" = {
+    device = "ssds/var/lib/ollama/models";
+    fsType = "zfs";
+  };
+
   # noauto: key must be loaded manually (zfs load-key hdds/sensitive) before mounting.
   # zfsutil must be explicit here since NixOS only infers it for auto-mounted datasets.
   fileSystems."/hdds/sensitive/media/music" = {

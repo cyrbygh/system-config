@@ -62,6 +62,17 @@ in {
   # don't gate whether the machine is "online".
   systemd.network.wait-online.extraArgs = [ "--interface=wan" ];
 
+  # For services that bind to the infra address; the VLANs come up a few seconds
+  # after network.target. The template inherits the extraArgs above, so this
+  # instance replaces them to wait on infra alone.
+  systemd.services."systemd-networkd-wait-online@infra" = {
+    overrideStrategy = "asDropin";
+    serviceConfig.ExecStart = [
+      ""
+      "${config.systemd.package}/lib/systemd/systemd-networkd-wait-online --interface=infra:routable"
+    ];
+  };
+
   # ── IP forwarding ──────────────────────────────────────────────────────────
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1;
