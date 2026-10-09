@@ -114,6 +114,11 @@ in
     fsType = "zfs";
   };
 
+  fileSystems."/var/lib/ironclaw" = {
+    device = "ssds/var/lib/ironclaw";
+    fsType = "zfs";
+  };
+
   # noauto: key must be loaded manually (zfs load-key hdds/sensitive) before mounting.
   # zfsutil must be explicit here since NixOS only infers it for auto-mounted datasets.
   fileSystems."/hdds/sensitive/media/music" = {

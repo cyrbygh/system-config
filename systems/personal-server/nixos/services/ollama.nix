@@ -7,6 +7,13 @@
     package = pkgs.ollama-cuda;
     host = "10.215.20.1";
     user = "ollama";
+    # 16K context for IronClaw's ~11K-token prompt; flash attention + q8 KV cache
+    # keep that and qwen3:14b within the 3060's 12 GB.
+    environmentVariables = {
+      OLLAMA_CONTEXT_LENGTH = "16384";
+      OLLAMA_FLASH_ATTENTION = "1";
+      OLLAMA_KV_CACHE_TYPE = "q8_0";
+    };
   };
 
   systemd.services.ollama = {

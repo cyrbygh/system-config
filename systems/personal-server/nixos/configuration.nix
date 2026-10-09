@@ -94,6 +94,7 @@ in
     ./services/omada-controller.nix
     ./services/ollama.nix
     ./services/open-webui.nix
+    ./services/ironclaw.nix
     ./sensitive.nix
   ];
 
