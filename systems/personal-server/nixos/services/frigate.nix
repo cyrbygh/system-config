@@ -37,6 +37,11 @@ in
 
   systemd.services.frigate.wants = [ "go2rtc.service" ];
 
+  # dvr/recordings mountpoint; root-owned when created.
+  systemd.tmpfiles.rules = [
+    "d /var/lib/frigate/recordings 0750 frigate frigate -"
+  ];
+
   # The module defaults all three listeners to every interface. API and RTSP are
   # only used by nginx and Frigate locally; WebRTC is off, so live view uses MSE
   # over the existing nginx vhost and nothing new is exposed.

@@ -134,7 +134,7 @@ in
     options = [ "noauto" "zfsutil" ];
   };
 
-  fileSystems."/dvr/recordings" = {
+  fileSystems."/var/lib/frigate/recordings" = {
     device = "dvr/recordings";
     fsType = "zfs";
   };
