@@ -311,6 +311,11 @@ in
     extra-trusted-public-keys = [ "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M=" ];
   };
 
+  boot.tmp = {
+    useTmpfs = true;
+    tmpfsSize = "32G";
+  };
+
   environment.systemPackages = lib.mkAfter (with pkgs; [
     asunder
     beets
