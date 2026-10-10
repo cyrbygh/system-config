@@ -13,7 +13,8 @@ in
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ "ahci" "vfat" "nls_cp437" "nls_iso8859_1" ];
-  boot.kernelModules = [ "kvm-intel" ];
+  # sg: SCSI generic devices, which MakeMKV needs to talk to the optical drives.
+  boot.kernelModules = [ "kvm-intel" "sg" ];
   boot.extraModulePackages = [];
 
 

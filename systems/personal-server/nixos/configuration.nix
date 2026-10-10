@@ -286,6 +286,7 @@ in
 
   users.users.muser = {
     extraGroups = lib.mkAfter [
+      "cdrom"  # Optical drives (/dev/sr*, /dev/sg*) for ripping.
       "input"  # Needed for libinput to open /dev/input/* devices.
       "render"
       "uinput" # Needed for sunshine remote input.
@@ -299,6 +300,7 @@ in
     "cuda_cudart"
     "cuda_nvcc"
     "libcublas"
+    "makemkv"
     "nvidia-x11"
     "open-webui"
   ];
@@ -310,11 +312,14 @@ in
   };
 
   environment.systemPackages = lib.mkAfter (with pkgs; [
+    asunder
+    beets
     claude-code
     fuzzel
     gnome-themes-extra
     kitty
     libnotify
+    makemkv
     mako
     pavucontrol
     ungoogled-chromium
