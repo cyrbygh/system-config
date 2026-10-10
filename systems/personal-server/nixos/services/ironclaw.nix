@@ -58,6 +58,8 @@ in
       OLLAMA_BASE_URL = "http://${ollama.host}:${toString ollama.port}";
       OLLAMA_MODEL = "qwen3:14b";
       LLM_REQUEST_TIMEOUT_SECS = "600";
+      # Max agent steps per message; stops runaway tool loops.
+      IRONCLAW_REBORN_PLANNED_DEFAULT_ITERATION_LIMIT = "8";
       SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt";
     };
 
