@@ -7,6 +7,9 @@
     (pkgs.writeShellScriptBin "start-sensitive-services" ''
       set -e
 
+      # hdds only holds noauto datasets, so NixOS imports it on demand, not at boot.
+      ${pkgs.systemd}/bin/systemctl start zfs-import-hdds.service
+
       key_status=$(${pkgs.zfs}/bin/zfs get -H -o value keystatus hdds/sensitive 2>/dev/null || true)
       if [ "$key_status" != "available" ]; then
         echo "Loading encryption key for hdds/sensitive..."
