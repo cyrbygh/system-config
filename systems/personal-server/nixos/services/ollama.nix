@@ -28,4 +28,11 @@
   systemd.tmpfiles.rules = [
     "d ${config.services.ollama.models} 0700 ollama ollama -"
   ];
+
+  # Nvidia device nodes: Ollama only. Overrides the nvidia module's mknod -m 666.
+  services.udev.extraRules = lib.mkAfter ''
+    KERNEL=="nvidia", RUN+="${pkgs.runtimeShell} -c '${pkgs.coreutils}/bin/chown root:ollama /dev/nvidiactl /dev/nvidia[0-9]*; ${pkgs.coreutils}/bin/chmod 0660 /dev/nvidiactl /dev/nvidia[0-9]*'"
+    KERNEL=="nvidia_modeset", RUN+="${pkgs.runtimeShell} -c '${pkgs.coreutils}/bin/chown root:ollama /dev/nvidia-modeset; ${pkgs.coreutils}/bin/chmod 0660 /dev/nvidia-modeset'"
+    KERNEL=="nvidia_uvm", RUN+="${pkgs.runtimeShell} -c '${pkgs.coreutils}/bin/chown root:ollama /dev/nvidia-uvm /dev/nvidia-uvm-tools; ${pkgs.coreutils}/bin/chmod 0660 /dev/nvidia-uvm /dev/nvidia-uvm-tools'"
+  '';
 }

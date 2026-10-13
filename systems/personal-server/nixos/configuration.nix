@@ -183,16 +183,6 @@ in
     GTK_THEME = "Adwaita-dark";
   };
 
-  # Force desktop apps and games onto the AMD GPU.
-  environment.sessionVariables = {
-    # Vulkan: AMD driver only.
-    VK_DRIVER_FILES = "/run/opengl-driver/share/vulkan/icd.d/radeon_icd.x86_64.json:/run/opengl-driver-32/share/vulkan/icd.d/radeon_icd.i686.json";
-    VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/radeon_icd.x86_64.json:/run/opengl-driver-32/share/vulkan/icd.d/radeon_icd.i686.json";
-    # OpenGL: Mesa only.
-    __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json:/run/opengl-driver-32/share/glvnd/egl_vendor.d/50_mesa.json";
-    __GLX_VENDOR_LIBRARY_NAME = "mesa";
-  };
-
   programs.steam.enable = true;
 
   systemd.tmpfiles.rules = [ "d /hdds/steam-library 0755 muser users -" ];
