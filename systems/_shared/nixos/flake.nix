@@ -39,6 +39,7 @@
         invidious       = unstable.invidious;
         vaultwarden     = unstable.vaultwarden;
         claude-code     = unstable.claude-code;
+        cura-appimage   = unstable.cura-appimage;
       };
   in {
     nixosConfigurations = lib.genAttrs systemNames (name:

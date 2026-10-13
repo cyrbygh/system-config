@@ -19,7 +19,10 @@ in
 
 
   boot.supportedFilesystems = [ "zfs" ];
-  boot.zfs.requestEncryptionCredentials = false;
+  # Load these keys automatically on pool import.
+  boot.zfs.requestEncryptionCredentials = [ "hdds/steam-library" ];
+  # Mount /boot before importing hdds; steam-library's key lives there.
+  systemd.services.zfs-import-hdds.unitConfig.RequiresMountsFor = [ "/boot" ];
   boot.zfs.forceImportRoot = false;
 
   # Mount the key disk in the initrd, load the ZFS encryption key,
@@ -42,7 +45,7 @@ in
   fileSystems."/boot" = {
     device = "/dev/disk/by-label/boot";
     fsType = "vfat";
-    options = [ "fmask=0022" "dmask=0022" ];
+    options = [ "fmask=0077" "dmask=0077" ];
   };
 
   fileSystems."/" = {
@@ -138,6 +141,11 @@ in
     device  = "hdds/sensitive/media/tv_shows";
     fsType  = "zfs";
     options = [ "noauto" "zfsutil" ];
+  };
+
+  fileSystems."/hdds/steam-library" = {
+    device = "hdds/steam-library";
+    fsType = "zfs";
   };
 
   fileSystems."/var/lib/frigate/recordings" = {
