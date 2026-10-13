@@ -138,6 +138,10 @@ in {
           # main: mDNS (required for HomeKit accessory discovery)
           iifname main udp dport 5353                        accept
 
+          # main: LocalSend (discovery + transfers)
+          iifname main tcp dport 53317                       accept
+          iifname main udp dport 53317                       accept
+
           iifname { main, iot } reject with icmpx admin-prohibited
 
           # WAN: DHCP response + ICMP + SSH (from masqueraded router IP)

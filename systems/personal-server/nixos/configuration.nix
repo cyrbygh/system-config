@@ -185,6 +185,8 @@ in
 
   programs.steam.enable = true;
 
+  programs.localsend.enable = true;
+
   systemd.tmpfiles.rules = [ "d /hdds/steam-library 0755 muser users -" ];
 
   # Linger starts muser's systemd instance at boot, which creates XDG_RUNTIME_DIR
