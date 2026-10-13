@@ -34,6 +34,7 @@ let
     { name = "cam-3";              n = 12; mac = "3c:52:a1:e5:be:fa"; }
     { name = "cam-4";              n = 13; mac = "3c:52:a1:e5:be:69"; }
     { name = "fridge";             n = 14; mac = "e0:85:4d:86:b4:ec"; }
+    { name = "3d-printer";         n = 15; mac = "3c:78:95:f1:37:95"; }
   ];
 
   mgmt = mkSubnet 50 [
