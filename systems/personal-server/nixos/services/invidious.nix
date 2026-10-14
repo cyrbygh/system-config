@@ -72,19 +72,18 @@
     };
   };
 
+  # Daily restart clears companion stalls; picks up a new image if one was pulled.
   systemd.services.invidious-companion-update = {
-    description = "Pull latest invidious-companion image and restart if changed";
+    description = "Pull latest invidious-companion image and restart it";
     after    = [ "network-online.target" ];
     wants    = [ "network-online.target" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = pkgs.writeShellScript "invidious-companion-update" ''
-        old=$(${pkgs.podman}/bin/podman inspect --format '{{.Id}}' quay.io/invidious/invidious-companion:latest 2>/dev/null || true)
         ${pkgs.podman}/bin/podman pull quay.io/invidious/invidious-companion:latest
-        new=$(${pkgs.podman}/bin/podman inspect --format '{{.Id}}' quay.io/invidious/invidious-companion:latest 2>/dev/null || true)
-        if [ -n "$new" ] && [ "$old" != "$new" ]; then
-          ${pkgs.systemd}/bin/systemctl restart podman-invidious-companion.service
-        fi
+        pulled=$?
+        ${pkgs.systemd}/bin/systemctl restart podman-invidious-companion.service
+        exit $pulled
       '';
     };
   };
@@ -92,7 +91,7 @@
   systemd.timers.invidious-companion-update = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnCalendar = "daily";
+      OnCalendar = "04:00";
       Persistent = true;
     };
   };
