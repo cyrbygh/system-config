@@ -331,6 +331,7 @@ in
     cura-appimage
     fuzzel
     gnome-themes-extra
+    kdePackages.okular
     kitty
     libnotify
     makemkv
