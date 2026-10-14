@@ -37,6 +37,9 @@ in
 
   systemd.services.frigate.wants = [ "go2rtc.service" ];
 
+  # SIGTERM only the main process; it stops its own workers.
+  systemd.services.frigate.serviceConfig.KillMode = "mixed";
+
   # dvr/recordings mountpoint; root-owned when created.
   systemd.tmpfiles.rules = [
     "d /var/lib/frigate/recordings 0750 frigate frigate -"
