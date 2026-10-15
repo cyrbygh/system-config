@@ -1,0 +1,165 @@
+{ config, lib, pkgs, modulesPath, ... }:
+
+let
+  loadZfsKey = pkgs.writeShellScript "load-zfs-key" ''
+    mkdir -p /run/keydev
+    mount -t vfat /dev/disk/by-label/boot /run/keydev
+    zfs load-key -L file:///run/keydev/zfs-key ssds
+    umount /run/keydev
+  '';
+in
+{
+  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+
+  boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
+  boot.initrd.kernelModules = [ "ahci" "vfat" "nls_cp437" "nls_iso8859_1" ];
+  # sg: SCSI generic devices, which MakeMKV needs to talk to the optical drives.
+  boot.kernelModules = [ "kvm-intel" "sg" ];
+  boot.extraModulePackages = [];
+
+
+  boot.supportedFilesystems = [ "zfs" ];
+  # Load these keys automatically on pool import.
+  boot.zfs.requestEncryptionCredentials = [ "hdds/steam-library" ];
+  # Mount /boot before importing hdds; steam-library's key lives there.
+  systemd.services.zfs-import-hdds.unitConfig.RequiresMountsFor = [ "/boot" ];
+  boot.zfs.forceImportRoot = false;
+
+  # Mount the key disk in the initrd, load the ZFS encryption key,
+  # then unmount before the pool datasets are mounted.
+  boot.initrd.systemd.storePaths = [ loadZfsKey ];
+  boot.initrd.systemd.services.load-zfs-key = {
+    description = "Load ZFS encryption key from boot partition";
+    wantedBy = [ "sysroot.mount" ];
+    before = [ "sysroot.mount" ];
+    after = [ "dev-disk-by\\x2dlabel-boot.device" "zfs-import.target" ];
+    requires = [ "dev-disk-by\\x2dlabel-boot.device" "zfs-import.target" ];
+    unitConfig.DefaultDependencies = false;
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = loadZfsKey;
+    };
+  };
+
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-label/boot";
+    fsType = "vfat";
+    options = [ "fmask=0077" "dmask=0077" ];
+  };
+
+  fileSystems."/" = {
+    device = "ssds/root";
+    fsType = "zfs";
+  };
+
+  fileSystems."/nix" = {
+    device = "ssds/nix";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var" = {
+    device = "ssds/var";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/postgresql" = {
+    device = "ssds/var/lib/postgresql";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/vaultwarden" = {
+    device = "ssds/var/lib/vaultwarden";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/invidious" = {
+    device = "ssds/var/lib/invidious";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/invidious-companion" = {
+    device = "ssds/var/lib/invidious-companion";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/gonic" = {
+    device = "ssds/var/lib/gonic";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/hass" = {
+    device = "ssds/var/lib/hass";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/omada-controller" = {
+    device = "ssds/var/lib/omada-controller";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/zigbee2mqtt" = {
+    device = "ssds/var/lib/zigbee2mqtt";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/jellyfin" = {
+    device = "ssds/var/lib/jellyfin";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/ollama" = {
+    device = "ssds/var/lib/ollama";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/ollama/models" = {
+    device = "ssds/var/lib/ollama/models";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/ironclaw" = {
+    device = "ssds/var/lib/ironclaw";
+    fsType = "zfs";
+  };
+
+  # noauto: key must be loaded manually (zfs load-key hdds/sensitive) before mounting.
+  # zfsutil must be explicit here since NixOS only infers it for auto-mounted datasets.
+  fileSystems."/hdds/sensitive/media/music" = {
+    device  = "hdds/sensitive/media/music";
+    fsType  = "zfs";
+    options = [ "noauto" "zfsutil" ];
+  };
+
+  fileSystems."/hdds/sensitive/media/movies" = {
+    device  = "hdds/sensitive/media/movies";
+    fsType  = "zfs";
+    options = [ "noauto" "zfsutil" ];
+  };
+
+  fileSystems."/hdds/sensitive/media/tv_shows" = {
+    device  = "hdds/sensitive/media/tv_shows";
+    fsType  = "zfs";
+    options = [ "noauto" "zfsutil" ];
+  };
+
+  fileSystems."/hdds/steam-library" = {
+    device = "hdds/steam-library";
+    fsType = "zfs";
+  };
+
+  fileSystems."/var/lib/frigate/recordings" = {
+    device = "dvr/recordings";
+    fsType = "zfs";
+  };
+
+  services.udev.extraRules = ''
+    SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="ea24a9b0c58aef11967427ccef8776e9", GROUP="dialout", MODE="0660", SYMLINK+="ttyZB0", TAG+="systemd"
+    SUBSYSTEM=="tty", ENV{ID_SERIAL_SHORT}=="533D004242", GROUP="dialout", MODE="0660", SYMLINK+="ttyZW0", TAG+="systemd"
+  '';
+
+  swapDevices = [];
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+}
