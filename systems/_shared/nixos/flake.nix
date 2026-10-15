@@ -25,8 +25,7 @@
       ))
       builtins.attrNames
     ];
-    # Pull home-assistant from unstable so the package version stays close to
-    # HaOS releases and storage-format compatibility is maintained.
+    # Packages that need to track upstream more closely than the stable channel.
     unstableOverlay = final: prev:
       let
         unstable = import nixpkgs-unstable {
