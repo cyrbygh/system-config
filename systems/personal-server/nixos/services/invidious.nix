@@ -1,20 +1,16 @@
 { config, lib, pkgs, ... }:
 
 {
-  # invidious_companion (public_url holds the domain).
-  age.secrets.invidious-settings = {
-    file  = ../../secrets/invidious-settings.age;
-    owner = "invidious";
-  };
+  # Shared by Invidious and the companion: SERVER_SECRET_KEY, plus Invidious's
+  # INVIDIOUS_INVIDIOUS_COMPANION{,_KEY} setting overrides.
+  age.secrets.invidious-env.file = ../../secrets/invidious-env.age;
 
   services.invidious = {
     enable = true;
     port   = 3001;
     settings = {
       check_tables = true;
-      invidious_companion_key = "3805800f15dd4724";
     };
-    extraSettingsFile = config.age.secrets.invidious-settings.path;
     # null host = connect via unix socket; peer auth, no password needed.
     database.createLocally = false;
     database.host = null;
@@ -26,7 +22,7 @@
     containers.invidious-companion = {
       image   = "quay.io/invidious/invidious-companion:latest";
       ports   = [ "127.0.0.1:8282:8282" ];
-      environment.SERVER_SECRET_KEY = "3805800f15dd4724";
+      environmentFiles = [ config.age.secrets.invidious-env.path ];
       volumes = [ "/var/lib/invidious-companion:/var/tmp/youtubei.js:rw" ];
       extraOptions = [
         "--cap-drop=ALL"
@@ -56,6 +52,7 @@
     after    = [ "postgresql.service" "var-lib-invidious.mount" ];
     requires = [ "postgresql.service" "var-lib-invidious.mount" ];
     serviceConfig = {
+      EnvironmentFile = config.age.secrets.invidious-env.path;
       DynamicUser    = lib.mkForce false;
       User           = lib.mkForce "invidious";
       Group          = lib.mkForce "invidious";
