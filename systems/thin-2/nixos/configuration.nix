@@ -5,6 +5,9 @@ let
   # alike; "detect" hands it back. Lid close is inhibited while docked on AC, and the power
   # key is inhibited while undocked.
   externalMonitorSwitch = pkgs.writeShellScript "external-monitor-switch" ''
+    # Debounce: each uevent in a burst restarts the unit, so only the last run gets past this.
+    sleep 2
+
     edp=$(echo /sys/class/drm/card*-eDP-1/status)
     dp=$(echo /sys/class/drm/card*-DP-1/status)
 
@@ -64,6 +67,7 @@ in
   # External monitor on DP-1 replaces the internal panel.
   systemd.services.external-monitor-switch = {
     wantedBy = [ "multi-user.target" ];
+    unitConfig.StartLimitIntervalSec = 0;
     serviceConfig = {
       Type = "oneshot";
       ExecStart = externalMonitorSwitch;
