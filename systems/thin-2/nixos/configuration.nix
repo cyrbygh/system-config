@@ -9,11 +9,14 @@ let
     sleep 2
 
     edp=$(echo /sys/class/drm/card*-eDP-1/status)
-    dp=$(echo /sys/class/drm/card*-DP-1/status)
 
+    # The dock is MST, so its outputs appear as new DP-N connectors.
     docked=
-    if [ "$(cat "$dp")" = connected ]; then
-      docked=1
+    for s in /sys/class/drm/card*-DP-*/status /sys/class/drm/card*-HDMI-*/status; do
+      [ "$(cat "$s" 2>/dev/null)" = connected ] && docked=1
+    done
+
+    if [ -n "$docked" ]; then
       [ "$(cat "$edp")" = disconnected ] || echo off > "$edp"
     elif [ "$(cat "$edp")" = disconnected ]; then
       echo detect > "$edp"
