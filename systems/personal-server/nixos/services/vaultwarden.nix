@@ -14,7 +14,7 @@
 
   services.traefik.dynamicConfigOptions.http = {
     routers.vaultwarden = {
-      rule        = "Host(`bitwarden.example.com`)";
+      rule        = "Host(`bitwarden.{{ env `DOMAIN` }}`)";
       entryPoints = [ "websecure" ];
       service     = "vaultwarden";
       tls.certResolver = "letsencrypt";

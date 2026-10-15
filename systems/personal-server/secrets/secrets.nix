@@ -9,4 +9,6 @@ in
   "ssh-key.age".publicKeys                   = [ personal-server ];
   "nut-monitor-password.age".publicKeys      = [ personal-server ];
   "frigate-rtsp-credentials.age".publicKeys  = [ personal-server ];
+  "domain-env.age".publicKeys                = [ personal-server ];
+  "invidious-settings.age".publicKeys        = [ personal-server ];
 }

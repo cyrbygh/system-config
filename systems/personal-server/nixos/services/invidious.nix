@@ -1,17 +1,20 @@
 { config, lib, pkgs, ... }:
 
 {
+  # invidious_companion (public_url holds the domain).
+  age.secrets.invidious-settings = {
+    file  = ../../secrets/invidious-settings.age;
+    owner = "invidious";
+  };
+
   services.invidious = {
     enable = true;
     port   = 3001;
     settings = {
       check_tables = true;
-      invidious_companion = [{
-        private_url = "http://localhost:8282/companion";
-        public_url  = "https://invidious.example.com/companion";
-      }];
       invidious_companion_key = "3805800f15dd4724";
     };
+    extraSettingsFile = config.age.secrets.invidious-settings.path;
     # null host = connect via unix socket; peer auth, no password needed.
     database.createLocally = false;
     database.host = null;
@@ -35,7 +38,7 @@
 
   services.traefik.dynamicConfigOptions.http = {
     routers.invidious = {
-      rule        = "Host(`invidious.example.com`)";
+      rule        = "Host(`invidious.{{ env `DOMAIN` }}`)";
       entryPoints = [ "websecure" ];
       service     = "invidious";
       tls.certResolver = "letsencrypt";

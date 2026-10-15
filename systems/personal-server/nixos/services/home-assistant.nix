@@ -29,7 +29,7 @@
 
   services.traefik.dynamicConfigOptions.http = {
     routers.hass = {
-      rule        = "Host(`hass.example.com`)";
+      rule        = "Host(`hass.{{ env `DOMAIN` }}`)";
       entryPoints = [ "websecure" ];
       service     = "hass";
       tls.certResolver = "letsencrypt";

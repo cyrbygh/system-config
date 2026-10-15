@@ -52,7 +52,7 @@
 
   services.traefik.dynamicConfigOptions.http = {
     routers.jellyfin = {
-      rule        = "Host(`media.example.com`)";
+      rule        = "Host(`media.{{ env `DOMAIN` }}`)";
       entryPoints = [ "websecure" ];
       service     = "jellyfin";
       tls.certResolver = "letsencrypt";

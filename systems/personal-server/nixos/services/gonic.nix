@@ -29,7 +29,7 @@
 
   services.traefik.dynamicConfigOptions.http = {
     routers.gonic = {
-      rule        = "Host(`music.example.com`)";
+      rule        = "Host(`music.{{ env `DOMAIN` }}`)";
       entryPoints = [ "websecure" ];
       service     = "gonic";
       tls.certResolver = "letsencrypt";

@@ -7,6 +7,9 @@
     owner = "traefik";
   };
 
+  # DOMAIN (router rules) and INVIDIOUS_INSTANCE (miniflux).
+  age.secrets.domain-env.file = ../../secrets/domain-env.age;
+
   services.traefik = {
     enable = true;
 
@@ -27,5 +30,9 @@
     };
   };
 
-  systemd.services.traefik.serviceConfig.EnvironmentFile = config.age.secrets.traefik-acme-email.path;
+  # Router rules read DOMAIN via Traefik's templating: {{ env `DOMAIN` }}.
+  systemd.services.traefik.serviceConfig.EnvironmentFile = [
+    config.age.secrets.traefik-acme-email.path
+    config.age.secrets.domain-env.path
+  ];
 }
